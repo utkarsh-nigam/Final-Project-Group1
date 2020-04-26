@@ -13,7 +13,7 @@ from scipy import interp
 from itertools import cycle
 
 
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QSizePolicy, QMessageBox
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QSizePolicy, QFormLayout, QMessageBox
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -112,6 +112,16 @@ class RandomForest(QMainWindow):
         self.feature17 = QCheckBox(features_list[17], self)
         self.feature18 = QCheckBox(features_list[18], self)
         self.feature19 = QCheckBox(features_list[19], self)
+        self.feature20 = QCheckBox(features_list[20], self)
+        self.feature21 = QCheckBox(features_list[21], self)
+        self.feature22 = QCheckBox(features_list[22], self)
+        self.feature23 = QCheckBox(features_list[23], self)
+        self.feature24 = QCheckBox(features_list[24], self)
+        self.feature25 = QCheckBox(features_list[25], self)
+        self.feature26 = QCheckBox(features_list[26], self)
+        self.feature27 = QCheckBox(features_list[27], self)
+        self.feature28 = QCheckBox(features_list[28], self)
+        self.feature29 = QCheckBox(features_list[29], self)
         self.feature0.setChecked(True)
         self.feature1.setChecked(True)
         self.feature2.setChecked(True)
@@ -132,6 +142,16 @@ class RandomForest(QMainWindow):
         self.feature17.setChecked(True)
         self.feature18.setChecked(True)
         self.feature19.setChecked(True)
+        self.feature20.setChecked(True)
+        self.feature21.setChecked(True)
+        self.feature22.setChecked(True)
+        self.feature23.setChecked(True)
+        self.feature24.setChecked(True)
+        self.feature25.setChecked(True)
+        self.feature26.setChecked(True)
+        self.feature27.setChecked(True)
+        self.feature28.setChecked(True)
+        self.feature29.setChecked(True)
 
         self.lblPercentTest = QLabel('Percentage for Test :')
         self.lblPercentTest.adjustSize()
@@ -142,38 +162,49 @@ class RandomForest(QMainWindow):
         self.btnExecute = QPushButton("Run Model")
         self.btnExecute.clicked.connect(self.update)
 
-        self.groupBox1Layout.addWidget(self.btnExecute, 0, 0)
-        self.groupBox1Layout.addWidget(self.lblPercentTest, 1, 0)
-        self.groupBox1Layout.addWidget(self.txtPercentTest, 1, 1)
-        self.groupBox1Layout.addWidget(self.feature0,2,0)
-        self.groupBox1Layout.addWidget(self.feature1,2,1)
-        self.groupBox1Layout.addWidget(self.feature2,3,0)
-        self.groupBox1Layout.addWidget(self.feature3,3,1)
-        self.groupBox1Layout.addWidget(self.feature4,4,0)
-        self.groupBox1Layout.addWidget(self.feature5,4,1)
-        self.groupBox1Layout.addWidget(self.feature6,5,0)
-        self.groupBox1Layout.addWidget(self.feature7,5,1)
-        self.groupBox1Layout.addWidget(self.feature8, 6, 0)
-        self.groupBox1Layout.addWidget(self.feature9, 6, 1)
-        self.groupBox1Layout.addWidget(self.feature10, 7, 0)
-        self.groupBox1Layout.addWidget(self.feature11, 7, 1)
-        self.groupBox1Layout.addWidget(self.feature12, 8, 0)
-        self.groupBox1Layout.addWidget(self.feature13, 8, 1)
-        self.groupBox1Layout.addWidget(self.feature14, 9, 0)
-        self.groupBox1Layout.addWidget(self.feature15, 9, 1)
-        self.groupBox1Layout.addWidget(self.feature16, 10, 0)
-        self.groupBox1Layout.addWidget(self.feature17, 10, 1)
-        self.groupBox1Layout.addWidget(self.feature18, 11, 0)
-        self.groupBox1Layout.addWidget(self.feature19, 11, 1)
+        self.groupBox1Layout.addWidget(self.feature0,0,0,1,1)
+        self.groupBox1Layout.addWidget(self.feature1,0,1,1,1)
+        self.groupBox1Layout.addWidget(self.feature2,1,0,1,1)
+        self.groupBox1Layout.addWidget(self.feature3,1,1,1,1)
+        self.groupBox1Layout.addWidget(self.feature4,2,0,1,1)
+        self.groupBox1Layout.addWidget(self.feature5,2,1,1,1)
+        self.groupBox1Layout.addWidget(self.feature6,3,0,1,1)
+        self.groupBox1Layout.addWidget(self.feature7,3,1,1,1)
+        self.groupBox1Layout.addWidget(self.feature8, 4, 0,1,1)
+        self.groupBox1Layout.addWidget(self.feature9, 4, 1,1,1)
+        self.groupBox1Layout.addWidget(self.feature10, 5, 0,1,1)
+        self.groupBox1Layout.addWidget(self.feature11, 5, 1,1,1)
+        self.groupBox1Layout.addWidget(self.feature12, 6, 0,1,1)
+        self.groupBox1Layout.addWidget(self.feature13, 6, 1,1,1)
+        self.groupBox1Layout.addWidget(self.feature14, 7, 0,1,1)
+        self.groupBox1Layout.addWidget(self.feature15, 7, 1,1,1)
+        self.groupBox1Layout.addWidget(self.feature16, 8, 0,1,1)
+        self.groupBox1Layout.addWidget(self.feature17, 8, 1,1,1)
+        self.groupBox1Layout.addWidget(self.feature18, 9, 0,1,1)
+        self.groupBox1Layout.addWidget(self.feature19, 9, 1,1,1)
+        self.groupBox1Layout.addWidget(self.feature20, 10, 0,1,1)
+        self.groupBox1Layout.addWidget(self.feature21, 10, 1,1,1)
+        self.groupBox1Layout.addWidget(self.feature22, 11, 0,1,1)
+        self.groupBox1Layout.addWidget(self.feature23, 11, 1,1,1)
+        self.groupBox1Layout.addWidget(self.feature24, 12, 0,1,1)
+        self.groupBox1Layout.addWidget(self.feature25, 12, 1,1,1)
+        self.groupBox1Layout.addWidget(self.feature26, 13, 0,1,1)
+        self.groupBox1Layout.addWidget(self.feature27, 13, 1,1,1)
+        self.groupBox1Layout.addWidget(self.feature28, 14, 0,1,1)
+        self.groupBox1Layout.addWidget(self.feature29, 14, 1,1,1)
+        self.groupBox1Layout.addWidget(self.lblPercentTest, 15, 0,1,1)
+        self.groupBox1Layout.addWidget(self.txtPercentTest, 15, 1,1,1)
+        self.groupBox1Layout.addWidget(self.btnExecute, 16, 0,1,2)
 
-
-        self.groupBox2 = QGroupBox('Results from the mdel')
+        self.groupBox2 = QGroupBox('Results from the model')
         self.groupBox2Layout = QVBoxLayout()
         self.groupBox2.setLayout(self.groupBox2Layout)
+        self.groupBox2.setMinimumSize(400, 50)
 
         self.lblResults = QLabel('Results:')
         self.lblResults.adjustSize()
         self.txtResults = QPlainTextEdit()
+        #self.txtResults.setMinimumSize(200,100)
         self.lblAccuracy = QLabel('Accuracy:')
         self.txtAccuracy = QLineEdit()
 
@@ -181,6 +212,30 @@ class RandomForest(QMainWindow):
         self.groupBox2Layout.addWidget(self.txtResults)
         self.groupBox2Layout.addWidget(self.lblAccuracy)
         self.groupBox2Layout.addWidget(self.txtAccuracy)
+
+
+        self.groupBox3 = QGroupBox('Summary and Comparison')
+        self.groupBox3Layout = QVBoxLayout()
+        self.groupBox3.setLayout(self.groupBox3Layout)
+        self.groupBox3.setMinimumSize(400, 50)
+
+        self.lbl_summary = QLabel('Summary:')
+        self.lbl_summary.adjustSize()
+        self.txt_summary = QPlainTextEdit()
+        self.lbl_other_models = QLabel('Other Models Performance:')
+        self.other_models = QWidget(self)
+        self.other_models.layout = QFormLayout(self.other_models)
+        #self.other_modelsLayout = QFormLayout()
+        #self.other_models.setLayout(self.other_modelsLayout)
+        self.other_models.layout.addRow('Logistic:', QLineEdit())
+        self.other_models.layout.addRow('KNN:', QLineEdit())
+        self.other_models.layout.addRow('Decision Trees:', QLineEdit())
+
+        self.groupBox3Layout.addWidget(self.lbl_summary)
+        self.groupBox3Layout.addWidget(self.txt_summary)
+        self.groupBox3Layout.addWidget(self.lbl_other_models)
+        self.groupBox3Layout.addWidget(self.other_models)
+
 
         #::--------------------------------------
         # Graphic 1 : Confusion Matrix
@@ -260,15 +315,16 @@ class RandomForest(QMainWindow):
         # End of graphs
         #::-------------------------------------------------
 
-        self.layout.addWidget(self.groupBox1,0,0)
-        self.layout.addWidget(self.groupBoxG1,0,1)
-        self.layout.addWidget(self.groupBoxG3, 0, 2)
-        self.layout.addWidget(self.groupBox2,1,0)
-        self.layout.addWidget(self.groupBoxG2,1,1)
-        self.layout.addWidget(self.groupBoxG4,1,2)
+        self.layout.addWidget(self.groupBox1,0,0,2,1)
+        self.layout.addWidget(self.groupBoxG1,0,1,1,1)
+        self.layout.addWidget(self.groupBoxG3,0,2,1,1)
+        self.layout.addWidget(self.groupBox2,0,3,1,1)
+        self.layout.addWidget(self.groupBoxG2,1,1,1,1)
+        self.layout.addWidget(self.groupBoxG4,1,2,1,1)
+        self.layout.addWidget(self.groupBox3,1,3,1,1)
 
         self.setCentralWidget(self.main_widget)
-        self.resize(1100, 700)
+        self.resize(1800, 900)
         self.show()
 
     def update(self):
