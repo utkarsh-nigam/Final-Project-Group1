@@ -29,8 +29,12 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve, auc
+from sklearn.linear_model import LogisticRegression
+from sklearn import feature_selection
+from sklearn import metrics
 from sklearn.preprocessing import label_binarize
 
 # Libraries to display decision tree
@@ -227,9 +231,12 @@ class RandomForest(QMainWindow):
         self.other_models.layout = QFormLayout(self.other_models)
         #self.other_modelsLayout = QFormLayout()
         #self.other_models.setLayout(self.other_modelsLayout)
-        self.other_models.layout.addRow('Logistic:', QLineEdit())
-        self.other_models.layout.addRow('KNN:', QLineEdit())
-        self.other_models.layout.addRow('Decision Trees:', QLineEdit())
+        self.txtAccuracy_lr = QLineEdit()
+        self.txtAccuracy_knn = QLineEdit()
+        self.txtAccuracy_dt = QLineEdit()
+        self.other_models.layout.addRow('Logistic:', self.txtAccuracy_lr)
+        self.other_models.layout.addRow('KNN:', self.txtAccuracy_knn)
+        self.other_models.layout.addRow('Decision Trees:', self.txtAccuracy_dt)
 
         self.groupBox3Layout.addWidget(self.lbl_summary)
         self.groupBox3Layout.addWidget(self.txt_summary)
@@ -615,8 +622,8 @@ class RandomForest(QMainWindow):
         #::-----------------------------------------------------
         # Graph 4 - ROC Curve by Class
         #::-----------------------------------------------------
-        str_classes= ['HP','MEH','LOH','NH']
-        colors = cycle(['magenta', 'darkorange', 'green', 'blue'])
+        str_classes= ['No','Yes']
+        colors = cycle(['magenta', 'darkorange'])
         for i, color in zip(range(n_classes), colors):
             self.ax4.plot(fpr[i], tpr[i], color=color, lw=lw,
                      label='{0} (area = {1:0.2f})'
@@ -636,6 +643,32 @@ class RandomForest(QMainWindow):
 
         #::-----------------------------
         # End of graph 4  - ROC curve by class
+        #::-----------------------------
+
+        #::-----------------------------------------------------
+        # Other Models Comparison
+        #::-----------------------------------------------------
+
+        self.other_clf_lr=LogisticRegression(random_state=500)
+        self.other_clf_lr.fit(X_train, y_train)
+        y_pred_lr = self.other_clf_lr.predict(X_test)
+        self.accuracy_lr=accuracy_score(y_test, y_pred_lr) *100
+        self.txtAccuracy_lr.setText(str(self.accuracy_lr))
+
+        self.other_clf_dt = DecisionTreeClassifier(criterion="gini")
+        self.other_clf_dt.fit(X_train, y_train)
+        y_pred_dt = self.other_clf_dt.predict(X_test)
+        self.accuracy_dt = accuracy_score(y_test, y_pred_dt) * 100
+        self.txtAccuracy_dt.setText(str(self.accuracy_dt))
+
+        self.other_clf_knn = KNeighborsClassifier(n_neighbors=9)
+        self.other_clf_knn.fit(X_train, y_train)
+        y_pred_knn = self.other_clf_knn.predict(X_test)
+        self.accuracy_knn = accuracy_score(y_test, y_pred_knn) * 100
+        self.txtAccuracy_knn.setText(str(self.accuracy_knn))
+
+        #::-----------------------------
+        # End of Other Models Comparison
         #::-----------------------------
 
 
