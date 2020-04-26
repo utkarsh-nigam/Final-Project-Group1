@@ -1646,7 +1646,7 @@ def attrition_data():
     #happiness = pd.read_csv('2017.csv')
     #X= happiness["Happiness.Score"]
     #y= happiness["Country"]
-    attr_data = pd.read_csv('WA_Fn-UseC_-HR-Employee-Attrition.csv')
+    attr_data = pd.read_csv('HR-Employee-Attrition.csv')
     all_columns = attr_data.columns.tolist()
     #print(all_columns)
     all_columns.remove("Attrition")
