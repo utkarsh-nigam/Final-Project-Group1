@@ -425,8 +425,8 @@ class RandomForest(QMainWindow):
         X_columns=X_dt.columns.tolist()
         labelencoder_columns= list(set(X_columns) & set(label_encoder_variables))
         one_hot_encoder_columns=list(set(X_columns) & set(hot_encoder_variables))
-        print(labelencoder_columns)
-        print(one_hot_encoder_columns)
+        #print(labelencoder_columns)
+        #print(one_hot_encoder_columns)
         class_le = LabelEncoder()
         class_ohe=OneHotEncoder()
         #X_dt[labelencoder_columns] = class_le.fit_transform(X_dt[labelencoder_columns])
@@ -499,7 +499,10 @@ class RandomForest(QMainWindow):
         #::----------------------------------------
         ## Graph 2 - ROC Curve
         #::----------------------------------------
-        y_test_bin = label_binarize(y_test, classes=[0, 1])
+        #y_test_bin = label_binarize(y_test, classes=[0, 1])
+        #print(pd.get_dummies(y_test))
+        #print(pd.get_dummies(y_test).to_numpy())
+        y_test_bin=pd.get_dummies(y_test).to_numpy()
         n_classes = y_test_bin.shape[1]
 
         #From the sckict learn site
@@ -510,15 +513,17 @@ class RandomForest(QMainWindow):
         for i in range(n_classes):
             fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_score[:, i])
             roc_auc[i] = auc(fpr[i], tpr[i])
+        #print(pd.get_dummies(y_test).to_numpy().ravel())
 
+        #print("\n\n********************************\n\n")
+        #print(y_pred_score.ravel())
         # Compute micro-average ROC curve and ROC area
         fpr["micro"], tpr["micro"], _ = roc_curve(y_test_bin.ravel(), y_pred_score.ravel())
 
         roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
-
         lw = 2
-        self.ax2.plot(fpr[2], tpr[2], color='darkorange',
-                      lw=lw, label='ROC curve (area = %0.2f)' % roc_auc[2])
+        self.ax2.plot(fpr[1], tpr[1], color='darkorange',
+                      lw=lw, label='ROC curve (area = %0.2f)' % roc_auc[1])
         self.ax2.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
         self.ax2.set_xlim([0.0, 1.0])
         self.ax2.set_ylim([0.0, 1.05])
@@ -536,11 +541,11 @@ class RandomForest(QMainWindow):
         importances = self.clf_rf.feature_importances_
 
         # convert the importances into one-dimensional 1darray with corresponding df column names as axis labels
-        f_importances = pd.Series(importances, self.list_corr_features.columns)
+        f_importances = pd.Series(importances, X_dt.columns)
 
         # sort the array in descending order of the importances
         f_importances.sort_values(ascending=False, inplace=True)
-
+        f_importances=f_importances[0:10]
         X_Features = f_importances.index
         y_Importance = list(f_importances)
 
