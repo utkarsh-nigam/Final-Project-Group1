@@ -180,13 +180,18 @@ print(df)
 x = df.drop(columns='Attrition')
 y = df['Attrition']
 
+
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=12)
+
+
 logreg = LogisticRegression()
 logreg.fit(x_train, y_train)
+
 train_Pred = logreg.predict(x_train)
 metrics.confusion_matrix(y_train,train_Pred)
 metrics.accuracy_score(y_train,train_Pred)
 test_Pred = logreg.predict(x_test)
+
 metrics.confusion_matrix(y_test,test_Pred)
 metrics.accuracy_score(y_test,test_Pred)
 
