@@ -132,3 +132,75 @@ y_pred = model.predict(X_test)
 # Get Accuracy
 accuracy = metrics.accuracy_score(y_test, y_pred)
 print(accuracy)
+
+-----------------------------------------------------------------------------------
+
+#ALTERNATE CODE
+
+import os
+
+
+# Ignore  the warnings
+import warnings
+warnings.filterwarnings('always')
+warnings.filterwarnings('ignore')
+
+# data manipulation
+import numpy as np
+import pandas as pd
+
+# data visualisation
+import matplotlib.pyplot as plt
+from matplotlib import style
+import seaborn as sns
+from sklearn import metrics
+
+# sets matplotlib to inline
+
+
+# importing LogisticRegression for Test and Train
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+
+df = pd.read_csv("HR-Employee-Attrition.csv")
+df['Attrition'] = df['Attrition'].map(lambda x: 1 if x== 'Yes' else 0)
+
+cat_col = df.select_dtypes(exclude=np.number)
+print(cat_col)
+
+for i in cat_col:
+    print(df[i].value_counts())
+
+numerical_col = df.select_dtypes(include=np.number)
+print(numerical_col)
+
+one_hot_categorical_variables = pd.get_dummies(cat_col)
+df = pd.concat([numerical_col,one_hot_categorical_variables],sort=False,axis=1)
+print(df)
+x = df.drop(columns='Attrition')
+y = df['Attrition']
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=12)
+logreg = LogisticRegression()
+logreg.fit(x_train, y_train)
+train_Pred = logreg.predict(x_train)
+metrics.confusion_matrix(y_train,train_Pred)
+metrics.accuracy_score(y_train,train_Pred)
+test_Pred = logreg.predict(x_test)
+metrics.confusion_matrix(y_test,test_Pred)
+metrics.accuracy_score(y_test,test_Pred)
+
+from sklearn.metrics import classification_report
+print(classification_report(y_test, test_Pred))
+
+from sklearn.preprocessing import Imputer
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+
+train_y = y_train.ravel()
+for K in range(25):
+    K_value = K+1
+    neigh = KNeighborsClassifier(n_neighbors = K_value, weights='uniform', algorithm='auto')
+    neigh.fit(x_train, y_train)
+    predict_y = neigh.predict(x_test)
+    print ("Accuracy is ", accuracy_score(y_test,predict_y)*100,"% for K-Value:",K_value)
