@@ -420,8 +420,8 @@ class VariableRelation(QMainWindow):
         elif((graph_feature1 in continuous_features) and (graph_feature2 in continuous_features)):
             x_axis_data = self.filtered_data[graph_feature1]
             y_axis_data = self.filtered_data[graph_feature2]
-            print(x_axis_data)
-            print(y_axis_data)
+            #print(x_axis_data)
+            #print(y_axis_data)
             self.ax.scatter(x_axis_data, y_axis_data)
             b, m = polyfit(x_axis_data, y_axis_data, 1)
             self.ax.plot(x_axis_data, b + m * x_axis_data, '-', color="orange")
@@ -566,6 +566,12 @@ class RandomForest(QMainWindow):
         self.txtPercentTest = QLineEdit(self)
         self.txtPercentTest.setText("20")
 
+        self.lblEstimatorCount = QLabel('Neighbours:')
+        self.lblEstimatorCount.adjustSize()
+
+        self.txtEstimatorCount = QLineEdit(self)
+        self.txtEstimatorCount.setText("35")
+
         self.btnExecute = QPushButton("Run Model")
         self.btnExecute.clicked.connect(self.update)
 
@@ -601,7 +607,9 @@ class RandomForest(QMainWindow):
         self.groupBox1Layout.addWidget(self.feature29, 14, 1,1,1)
         self.groupBox1Layout.addWidget(self.lblPercentTest, 15, 0,1,1)
         self.groupBox1Layout.addWidget(self.txtPercentTest, 15, 1,1,1)
-        self.groupBox1Layout.addWidget(self.btnExecute, 16, 0,1,2)
+        self.groupBox1Layout.addWidget(self.lblEstimatorCount, 16, 0, 1, 1)
+        self.groupBox1Layout.addWidget(self.txtEstimatorCount, 16, 1, 1, 1)
+        self.groupBox1Layout.addWidget(self.btnExecute, 17, 0,1,2)
 
         self.groupBox2 = QGroupBox('Results from the model')
         self.groupBox2Layout = QVBoxLayout()
@@ -679,7 +687,7 @@ class RandomForest(QMainWindow):
 
         self.canvas2.updateGeometry()
 
-        self.groupBoxG2 = QGroupBox('ROC Curve')
+        self.groupBoxG2 = QGroupBox('AUC Score Vs Number of Trees')
         self.groupBoxG2Layout = QVBoxLayout()
         self.groupBoxG2.setLayout(self.groupBoxG2Layout)
 
@@ -871,6 +879,7 @@ class RandomForest(QMainWindow):
 
 
         vtest_per = float(self.txtPercentTest.text())
+        estimator_input = round(float(self.txtEstimatorCount.text()))
 
         # Clear the graphs to populate them with the new information
 
@@ -915,7 +924,7 @@ class RandomForest(QMainWindow):
         # Decision tree with entropy
 
         #specify random forest classifier
-        self.clf_rf = RandomForestClassifier(n_estimators=100, random_state=500)
+        self.clf_rf = RandomForestClassifier(n_estimators=estimator_input, random_state=500)
 
         # perform training
         self.clf_rf.fit(X_train, y_train)
@@ -954,7 +963,6 @@ class RandomForest(QMainWindow):
 
         for i in range(len(class_names)):
             for j in range(len(class_names)):
-                y_pred_score = self.clf_rf.predict_proba(X_test)
                 self.ax1.text(j, i, str(conf_matrix[i][j]))
 
         self.fig.tight_layout()
@@ -965,37 +973,25 @@ class RandomForest(QMainWindow):
         #::----------------------------------------
         ## Graph 2 - ROC Curve
         #::----------------------------------------
-        #y_test_bin = label_binarize(y_test, classes=[0, 1])
-        #print(pd.get_dummies(y_test))
-        #print(pd.get_dummies(y_test).to_numpy())
-        y_test_bin=pd.get_dummies(y_test).to_numpy()
-        n_classes = y_test_bin.shape[1]
 
-        #From the sckict learn site
-        #https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
-        fpr = dict()
-        tpr = dict()
-        roc_auc = dict()
-        for i in range(n_classes):
-            fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_score[:, i])
-            roc_auc[i] = auc(fpr[i], tpr[i])
-        #print(pd.get_dummies(y_test).to_numpy().ravel())
+        auc_test = []
+        auc_train = []
+        estimator_count= [1, 2, 4, 8, 16, 32, 50, 64, 100, 200, 300]
+        # Might take some time
+        for i in estimator_count:
+            self.rf_graph = RandomForestClassifier(n_estimators=i)
+            self.rf_graph.fit(X_train, y_train)
+            temp_train_pred=self.rf_graph.predict(X_train)
+            temp_test_pred=self.rf_graph.predict(X_test)
+            false_positive_rate, true_positive_rate, thresholds = roc_curve(y_train, temp_train_pred)
+            auc_train.append(auc(false_positive_rate, true_positive_rate))
+            false_positive_rate, true_positive_rate, thresholds = roc_curve(y_test, temp_test_pred)
+            auc_test.append(auc(false_positive_rate, true_positive_rate))
 
-        #print("\n\n********************************\n\n")
-        #print(y_pred_score.ravel())
-        # Compute micro-average ROC curve and ROC area
-        fpr["micro"], tpr["micro"], _ = roc_curve(y_test_bin.ravel(), y_pred_score.ravel())
-
-        roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
-        lw = 2
-        self.ax2.plot(fpr[1], tpr[1], color='darkorange',
-                      lw=lw, label='ROC curve (area = %0.2f)' % roc_auc[1])
-        self.ax2.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
-        self.ax2.set_xlim([0.0, 1.0])
-        self.ax2.set_ylim([0.0, 1.05])
-        self.ax2.set_xlabel('False Positive Rate')
-        self.ax2.set_ylabel('True Positive Rate')
-        self.ax2.set_title('ROC Curve Random Forest')
+        self.ax2.plot(estimator_count,auc_train , color='blue', label="Train AUC")
+        self.ax2.plot(estimator_count, auc_test, color='red', label="Test AUC")
+        self.ax2.set_xlabel('Number of Trees')
+        self.ax2.set_ylabel('AUC Score')
         self.ax2.legend(loc="lower right")
 
         self.fig2.tight_layout()
@@ -1025,6 +1021,26 @@ class RandomForest(QMainWindow):
         #::-----------------------------------------------------
         # Graph 4 - ROC Curve by Class
         #::-----------------------------------------------------
+        y_test_bin = pd.get_dummies(y_test).to_numpy()
+        n_classes = y_test_bin.shape[1]
+
+        # From the sckict learn site
+        # https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+        for i in range(n_classes):
+            fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_score[:, i])
+            roc_auc[i] = auc(fpr[i], tpr[i])
+        # print(pd.get_dummies(y_test).to_numpy().ravel())
+
+        # print("\n\n********************************\n\n")
+        # print(y_pred_score.ravel())
+        # Compute micro-average ROC curve and ROC area
+        fpr["micro"], tpr["micro"], _ = roc_curve(y_test_bin.ravel(), y_pred_score.ravel())
+
+        roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+        lw = 2
         str_classes= ['No','Yes']
         colors = cycle(['magenta', 'darkorange'])
         for i, color in zip(range(n_classes), colors):
@@ -1037,7 +1053,6 @@ class RandomForest(QMainWindow):
         self.ax4.set_ylim([0.0, 1.05])
         self.ax4.set_xlabel('False Positive Rate')
         self.ax4.set_ylabel('True Positive Rate')
-        self.ax4.set_title('ROC Curve by Class')
         self.ax4.legend(loc="lower right")
 
         # show the plot
@@ -1572,7 +1587,6 @@ class DecisionTree(QMainWindow):
 
         for i in range(len(class_names)):
             for j in range(len(class_names)):
-                y_pred_score = self.clf_dt.predict_proba(X_test)
                 self.ax1.text(j, i, str(conf_matrix[i][j]))
 
         self.fig.tight_layout()
@@ -1676,7 +1690,6 @@ class DecisionTree(QMainWindow):
         self.ax4.set_ylim([0.0, 1.05])
         self.ax4.set_xlabel('False Positive Rate')
         self.ax4.set_ylabel('True Positive Rate')
-        self.ax4.set_title('ROC Curve by Class')
         self.ax4.legend(loc="lower right")
 
         # show the plot
@@ -2293,7 +2306,6 @@ class LogisticRegressionClassifier(QMainWindow):
         self.ax4.set_ylim([0.0, 1.05])
         self.ax4.set_xlabel('False Positive Rate')
         self.ax4.set_ylabel('True Positive Rate')
-        self.ax4.set_title('ROC Curve by Class')
         self.ax4.legend(loc="lower right")
 
         # show the plot
@@ -2831,7 +2843,6 @@ class KNNClassifier(QMainWindow):
 
         for i in range(len(class_names)):
             for j in range(len(class_names)):
-                y_pred_score = self.clf_knn.predict_proba(X_test)
                 self.ax1.text(j, i, str(conf_matrix[i][j]))
 
         self.fig.tight_layout()
@@ -2843,19 +2854,26 @@ class KNNClassifier(QMainWindow):
         ## Graph 2 - ROC Curve
         #::----------------------------------------
 
-        error_rate = []
+        accuracy_test = []
+        accuracy_train = []
         # Might take some time
         for i in range(1, 20,2):
             self.knn_graph = KNeighborsClassifier(n_neighbors=i)
             self.knn_graph.fit(X_train, y_train)
+            pred_i = self.knn_graph.predict(X_train)
+            accuracy_train.append(accuracy_score(y_train, pred_i))
             pred_i = self.knn_graph.predict(X_test)
-            error_rate.append(accuracy_score(y_test, pred_i))
+            accuracy_test.append(accuracy_score(y_test, pred_i))
 
-        self.ax2.plot(range(1, 20,2), error_rate, color='orange', marker='o',
-                 markerfacecolor='red', markersize=5)
+        self.ax2.plot(range(1, 20,2),accuracy_train , color='blue', marker='o',
+                 markerfacecolor='orange', markersize=5,label="Train Accuracy")
+        self.ax2.plot(range(1, 20,2), accuracy_test, color='red', marker='o',
+                 markerfacecolor='orange', markersize=5, label="Test Accuracy")
+        self.ax2.set_xlabel('K')
         self.ax2.axes.set_xticks(np.arange(1,20,2))
         self.ax2.set_xlabel('K')
         self.ax2.set_ylabel('Accuracy')
+        self.ax2.legend(loc="lower right")
 
         self.fig2.tight_layout()
         self.fig2.canvas.draw_idle()
@@ -2928,7 +2946,6 @@ class KNNClassifier(QMainWindow):
         self.ax4.set_ylim([0.0, 1.05])
         self.ax4.set_xlabel('False Positive Rate')
         self.ax4.set_ylabel('True Positive Rate')
-        self.ax4.set_title('ROC Curve by Class')
         self.ax4.legend(loc="lower right")
 
         # show the plot
