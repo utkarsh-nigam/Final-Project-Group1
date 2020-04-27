@@ -10,9 +10,9 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtCore import Qt
 
 from scipy import interp
-from itertools import cycle
-
-
+from itertools import cycle, combinations
+import random
+import statsmodels.api as sm
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QSizePolicy, QFormLayout, QRadioButton, QScrollArea, QMessageBox
 from PyQt5.QtGui import QPixmap
 
@@ -32,7 +32,8 @@ from sklearn.metrics import confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import roc_auc_score
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_curve, auc, log_loss, brier_score_loss
+from sklearn.calibration import calibration_curve
 from sklearn.linear_model import LogisticRegression
 from sklearn import feature_selection
 from sklearn import metrics
@@ -1928,7 +1929,7 @@ class LogisticRegressionClassifier(QMainWindow):
 
         self.canvas2.updateGeometry()
 
-        self.groupBoxG2 = QGroupBox('ROC Curve')
+        self.groupBoxG2 = QGroupBox('Calibration Curve')
         self.groupBoxG2Layout = QVBoxLayout()
         self.groupBoxG2.setLayout(self.groupBoxG2Layout)
 
@@ -2175,7 +2176,6 @@ class LogisticRegressionClassifier(QMainWindow):
         y_pred = self.clf_lr.predict(X_test)
         y_pred_score = self.clf_lr.predict_proba(X_test)
 
-
         # confusion matrix for RandomForest
         conf_matrix = confusion_matrix(y_test, y_pred)
 
@@ -2203,7 +2203,6 @@ class LogisticRegressionClassifier(QMainWindow):
 
         for i in range(len(class_names)):
             for j in range(len(class_names)):
-                y_pred_score = self.clf_lr.predict_proba(X_test)
                 self.ax1.text(j, i, str(conf_matrix[i][j]))
 
         self.fig.tight_layout()
@@ -2215,13 +2214,28 @@ class LogisticRegressionClassifier(QMainWindow):
         ## Graph 2 - ROC Curve
         #::----------------------------------------
 
+        logreg_y, logreg_x = calibration_curve(y_test, y_pred_score[:,1], n_bins=10)
+        self.ax2.plot(logreg_x, logreg_y, marker='o', linewidth=1)
+        self.ax2.plot(np.linspace(0,1,10), np.linspace(0,1,10), linewidth=1, color="black")
+        self.ax2.set_xlabel('Predicted probability')
+        self.ax2.set_ylabel('True probability in each bin')
+
+        # show the plot
+        self.fig2.tight_layout()
+        self.fig2.canvas.draw_idle()
+
+
+        ######################################
+        # Graph - 3 Feature Importances
+        #####################################
+        # get feature importances
         scores_arr = []
         #feature_arr = []
         for val in (X_train.columns):
             #print(val)
             cvs_X = X_train[val].values.reshape(-1, 1)
             #print(cvs_X)
-            scores = cross_val_score(self.clf_lr, cvs_X, y_train, cv=3)
+            scores = cross_val_score(self.clf_lr, cvs_X, y_train, cv=10)
             scores_arr.append(scores.mean())
 
         #importances = self.clf_knn.feature_importances_
@@ -2856,7 +2870,7 @@ class KNNClassifier(QMainWindow):
             #print(val)
             cvs_X = X_train[val].values.reshape(-1, 1)
             #print(cvs_X)
-            scores = cross_val_score(self.clf_knn, cvs_X, y_train, cv=3)
+            scores = cross_val_score(self.clf_knn, cvs_X, y_train, cv=10)
             scores_arr.append(scores.mean())
 
         #importances = self.clf_knn.feature_importances_
