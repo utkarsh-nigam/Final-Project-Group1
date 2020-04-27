@@ -1285,6 +1285,8 @@ class DecisionTree(QMainWindow):
         self.labelImage.setPixmap(self.image)
         self.image_area = QScrollArea()
         self.image_area.setWidget(self.labelImage)
+        self.labelImage.setPixmap(QPixmap("temp_background.png"))
+        self.labelImage.adjustSize()
         #vbox.addWidget(labelImage)
 
         #self.image = QPixmap()
@@ -2211,38 +2213,8 @@ class LogisticRegressionClassifier(QMainWindow):
         #::----------------------------------------
         ## Graph 2 - ROC Curve
         #::----------------------------------------
-        #y_test_bin = label_binarize(y_test, classes=[0, 1])
-        #print(pd.get_dummies(y_test))
-        #print(pd.get_dummies(y_test).to_numpy())
-        y_test_bin=pd.get_dummies(y_test).to_numpy()
-        n_classes = y_test_bin.shape[1]
 
-        #From the sckict learn site
-        #https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
-        fpr = dict()
-        tpr = dict()
-        roc_auc = dict()
-        for i in range(n_classes):
-            fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_score[:, i])
-            roc_auc[i] = auc(fpr[i], tpr[i])
-        #print(pd.get_dummies(y_test).to_numpy().ravel())
 
-        #print("\n\n********************************\n\n")
-        #print(y_pred_score.ravel())
-        # Compute micro-average ROC curve and ROC area
-        fpr["micro"], tpr["micro"], _ = roc_curve(y_test_bin.ravel(), y_pred_score.ravel())
-
-        roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
-        lw = 2
-        self.ax2.plot(fpr[1], tpr[1], color='darkorange',
-                      lw=lw, label='ROC curve (area = %0.2f)' % roc_auc[1])
-        self.ax2.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
-        self.ax2.set_xlim([0.0, 1.0])
-        self.ax2.set_ylim([0.0, 1.05])
-        self.ax2.set_xlabel('False Positive Rate')
-        self.ax2.set_ylabel('True Positive Rate')
-        self.ax2.set_title('ROC Curve Random Forest')
-        self.ax2.legend(loc="lower right")
 
         self.fig2.tight_layout()
         self.fig2.canvas.draw_idle()
@@ -2286,6 +2258,29 @@ class LogisticRegressionClassifier(QMainWindow):
         #::-----------------------------------------------------
         # Graph 4 - ROC Curve by Class
         #::-----------------------------------------------------
+        # y_test_bin = label_binarize(y_test, classes=[0, 1])
+        # print(pd.get_dummies(y_test))
+        # print(pd.get_dummies(y_test).to_numpy())
+        y_test_bin = pd.get_dummies(y_test).to_numpy()
+        n_classes = y_test_bin.shape[1]
+
+        # From the sckict learn site
+        # https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+        for i in range(n_classes):
+            fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_score[:, i])
+            roc_auc[i] = auc(fpr[i], tpr[i])
+        # print(pd.get_dummies(y_test).to_numpy().ravel())
+
+        # print("\n\n********************************\n\n")
+        # print(y_pred_score.ravel())
+        # Compute micro-average ROC curve and ROC area
+        fpr["micro"], tpr["micro"], _ = roc_curve(y_test_bin.ravel(), y_pred_score.ravel())
+
+        roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+        lw = 2
         str_classes= ['No','Yes']
         colors = cycle(['magenta', 'darkorange'])
         for i, color in zip(range(n_classes), colors):
@@ -2439,6 +2434,12 @@ class KNNClassifier(QMainWindow):
         self.txtPercentTest = QLineEdit(self)
         self.txtPercentTest.setText("20")
 
+        self.lblNeighbourCount = QLabel('Neighbours:')
+        self.lblNeighbourCount.adjustSize()
+
+        self.txtNeighbourCount = QLineEdit(self)
+        self.txtNeighbourCount.setText("9")
+
         self.btnExecute = QPushButton("Run Model")
         self.btnExecute.clicked.connect(self.update)
 
@@ -2474,7 +2475,9 @@ class KNNClassifier(QMainWindow):
         self.groupBox1Layout.addWidget(self.feature29, 14, 1,1,1)
         self.groupBox1Layout.addWidget(self.lblPercentTest, 15, 0,1,1)
         self.groupBox1Layout.addWidget(self.txtPercentTest, 15, 1,1,1)
-        self.groupBox1Layout.addWidget(self.btnExecute, 16, 0,1,2)
+        self.groupBox1Layout.addWidget(self.lblNeighbourCount, 16, 0, 1, 1)
+        self.groupBox1Layout.addWidget(self.txtNeighbourCount, 16, 1, 1, 1)
+        self.groupBox1Layout.addWidget(self.btnExecute, 17, 0,1,2)
 
         self.groupBox2 = QGroupBox('Results from the model')
         self.groupBox2Layout = QVBoxLayout()
@@ -2552,7 +2555,7 @@ class KNNClassifier(QMainWindow):
 
         self.canvas2.updateGeometry()
 
-        self.groupBoxG2 = QGroupBox('ROC Curve')
+        self.groupBoxG2 = QGroupBox('Accuracy vs. K Value')
         self.groupBoxG2Layout = QVBoxLayout()
         self.groupBoxG2.setLayout(self.groupBoxG2Layout)
 
@@ -2744,6 +2747,7 @@ class KNNClassifier(QMainWindow):
 
 
         vtest_per = float(self.txtPercentTest.text())
+        neighbour_input = round(float(self.txtNeighbourCount.text()))
 
         # Clear the graphs to populate them with the new information
 
@@ -2788,7 +2792,7 @@ class KNNClassifier(QMainWindow):
         # Decision tree with entropy
 
         #specify random forest classifier
-        self.clf_knn = KNeighborsClassifier()
+        self.clf_knn = KNeighborsClassifier(n_neighbors=neighbour_input)
 
         # perform training
         self.clf_knn.fit(X_train, y_train)
@@ -2838,38 +2842,20 @@ class KNNClassifier(QMainWindow):
         #::----------------------------------------
         ## Graph 2 - ROC Curve
         #::----------------------------------------
-        #y_test_bin = label_binarize(y_test, classes=[0, 1])
-        #print(pd.get_dummies(y_test))
-        #print(pd.get_dummies(y_test).to_numpy())
-        y_test_bin=pd.get_dummies(y_test).to_numpy()
-        n_classes = y_test_bin.shape[1]
 
-        #From the sckict learn site
-        #https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
-        fpr = dict()
-        tpr = dict()
-        roc_auc = dict()
-        for i in range(n_classes):
-            fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_score[:, i])
-            roc_auc[i] = auc(fpr[i], tpr[i])
-        #print(pd.get_dummies(y_test).to_numpy().ravel())
+        error_rate = []
+        # Might take some time
+        for i in range(1, 20,2):
+            self.knn_graph = KNeighborsClassifier(n_neighbors=i)
+            self.knn_graph.fit(X_train, y_train)
+            pred_i = self.knn_graph.predict(X_test)
+            error_rate.append(accuracy_score(y_test, pred_i))
 
-        #print("\n\n********************************\n\n")
-        #print(y_pred_score.ravel())
-        # Compute micro-average ROC curve and ROC area
-        fpr["micro"], tpr["micro"], _ = roc_curve(y_test_bin.ravel(), y_pred_score.ravel())
-
-        roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
-        lw = 2
-        self.ax2.plot(fpr[1], tpr[1], color='darkorange',
-                      lw=lw, label='ROC curve (area = %0.2f)' % roc_auc[1])
-        self.ax2.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
-        self.ax2.set_xlim([0.0, 1.0])
-        self.ax2.set_ylim([0.0, 1.05])
-        self.ax2.set_xlabel('False Positive Rate')
-        self.ax2.set_ylabel('True Positive Rate')
-        self.ax2.set_title('ROC Curve Random Forest')
-        self.ax2.legend(loc="lower right")
+        self.ax2.plot(range(1, 20,2), error_rate, color='orange', marker='o',
+                 markerfacecolor='red', markersize=5)
+        self.ax2.axes.set_xticks(np.arange(1,20,2))
+        self.ax2.set_xlabel('K')
+        self.ax2.set_ylabel('Accuracy')
 
         self.fig2.tight_layout()
         self.fig2.canvas.draw_idle()
@@ -2898,6 +2884,29 @@ class KNNClassifier(QMainWindow):
         #::-----------------------------------------------------
         # Graph 4 - ROC Curve by Class
         #::-----------------------------------------------------
+        # y_test_bin = label_binarize(y_test, classes=[0, 1])
+        # print(pd.get_dummies(y_test))
+        # print(pd.get_dummies(y_test).to_numpy())
+        y_test_bin = pd.get_dummies(y_test).to_numpy()
+        n_classes = y_test_bin.shape[1]
+
+        # From the sckict learn site
+        # https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+        for i in range(n_classes):
+            fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_score[:, i])
+            roc_auc[i] = auc(fpr[i], tpr[i])
+        # print(pd.get_dummies(y_test).to_numpy().ravel())
+
+        # print("\n\n********************************\n\n")
+        # print(y_pred_score.ravel())
+        # Compute micro-average ROC curve and ROC area
+        fpr["micro"], tpr["micro"], _ = roc_curve(y_test_bin.ravel(), y_pred_score.ravel())
+
+        roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+        lw = 2
         str_classes= ['No','Yes']
         colors = cycle(['magenta', 'darkorange'])
         for i, color in zip(range(n_classes), colors):
