@@ -13,7 +13,8 @@ from scipy import interp
 from itertools import cycle
 
 
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QSizePolicy, QFormLayout, QRadioButton, QMessageBox
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QSizePolicy, QFormLayout, QRadioButton, QScrollArea, QMessageBox
+from PyQt5.QtGui import QPixmap
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -24,7 +25,7 @@ from numpy.polynomial.polynomial import polyfit
 
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, export_graphviz
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
@@ -39,8 +40,9 @@ from sklearn.preprocessing import label_binarize
 
 # Libraries to display decision tree
 from pydotplus import graph_from_dot_data
-from sklearn.tree import export_graphviz
-import webbrowser
+import collections
+#from sklearn.tree import export_graphviz
+#import webbrowser
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -1278,20 +1280,26 @@ class DecisionTree(QMainWindow):
         # Graphic 2 : ROC Curve
         #::---------------------------------------
 
-        self.fig2 = Figure()
-        self.ax2 = self.fig2.add_subplot(111)
-        self.axes2 = [self.ax2]
-        self.canvas2 = FigureCanvas(self.fig2)
+        self.labelImage = QLabel(self)
+        self.image = QPixmap()
+        self.labelImage.setPixmap(self.image)
+        self.image_area = QScrollArea()
+        self.image_area.setWidget(self.labelImage)
+        #vbox.addWidget(labelImage)
 
-        self.canvas2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        #self.image = QPixmap()
+        #label.setPixmap(pixmap)
+        #self.resize(pixmap.width(), pixmap.height())
+        #self.canvas2 = FigureCanvas(self.image)
 
-        self.canvas2.updateGeometry()
+        #self.canvas2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        self.groupBoxG2 = QGroupBox('ROC Curve')
+        #self.canvas2.updateGeometry()
+
+        self.groupBoxG2 = QGroupBox('Decision Tree Graph')
         self.groupBoxG2Layout = QVBoxLayout()
         self.groupBoxG2.setLayout(self.groupBoxG2Layout)
-
-        self.groupBoxG2Layout.addWidget(self.canvas2)
+        self.groupBoxG2Layout.addWidget(self.image_area)
 
         #::-------------------------------------------
         # Graphic 3 : Importance of Features
@@ -1483,7 +1491,6 @@ class DecisionTree(QMainWindow):
         # Clear the graphs to populate them with the new information
 
         self.ax1.clear()
-        self.ax2.clear()
         self.ax3.clear()
         self.ax4.clear()
         self.txtResults.clear()
@@ -1573,41 +1580,37 @@ class DecisionTree(QMainWindow):
         #::----------------------------------------
         ## Graph 2 - ROC Curve
         #::----------------------------------------
-        #y_test_bin = label_binarize(y_test, classes=[0, 1])
-        #print(pd.get_dummies(y_test))
-        #print(pd.get_dummies(y_test).to_numpy())
-        y_test_bin=pd.get_dummies(y_test).to_numpy()
-        n_classes = y_test_bin.shape[1]
 
-        #From the sckict learn site
-        #https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
-        fpr = dict()
-        tpr = dict()
-        roc_auc = dict()
-        for i in range(n_classes):
-            fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_score[:, i])
-            roc_auc[i] = auc(fpr[i], tpr[i])
-        #print(pd.get_dummies(y_test).to_numpy().ravel())
 
-        #print("\n\n********************************\n\n")
-        #print(y_pred_score.ravel())
-        # Compute micro-average ROC curve and ROC area
-        fpr["micro"], tpr["micro"], _ = roc_curve(y_test_bin.ravel(), y_pred_score.ravel())
 
-        roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
-        lw = 2
-        self.ax2.plot(fpr[1], tpr[1], color='darkorange',
-                      lw=lw, label='ROC curve (area = %0.2f)' % roc_auc[1])
-        self.ax2.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
-        self.ax2.set_xlim([0.0, 1.0])
-        self.ax2.set_ylim([0.0, 1.05])
-        self.ax2.set_xlabel('False Positive Rate')
-        self.ax2.set_ylabel('True Positive Rate')
-        self.ax2.set_title('ROC Curve Random Forest')
-        self.ax2.legend(loc="lower right")
+        #self.fig2.tight_layout()
+        #self.fig2.canvas.draw_idle()
 
-        self.fig2.tight_layout()
-        self.fig2.canvas.draw_idle()
+        dot_data = export_graphviz(self.clf_dt,
+                                        feature_names=X_train.columns,
+                                        class_names=['No', 'Yes'],
+                                        out_file=None,
+                                        filled=True,
+                                        rounded=True,
+                                        max_depth=3)
+
+        graph = graph_from_dot_data(dot_data)
+        colors = ('turquoise', 'orange')
+        edges = collections.defaultdict(list)
+
+        for edge in graph.get_edge_list():
+            edges[edge.get_source()].append(int(edge.get_destination()))
+
+        for edge in edges:
+            edges[edge].sort()
+            for i in range(2):
+                dest = graph.get_node(str(edges[edge][i]))[0]
+                dest.set_fillcolor(colors[i])
+        graph.set_size('"15,15!"')
+        graph.write_png('DecisionTree_Attrition.png')
+        self.labelImage.setPixmap(QPixmap("DecisionTree_Attrition.png"))
+        self.labelImage.adjustSize()
+
         ######################################
         # Graph - 3 Feature Importances
         #####################################
@@ -1633,6 +1636,30 @@ class DecisionTree(QMainWindow):
         #::-----------------------------------------------------
         # Graph 4 - ROC Curve by Class
         #::-----------------------------------------------------
+        # y_test_bin = label_binarize(y_test, classes=[0, 1])
+        # print(pd.get_dummies(y_test))
+        # print(pd.get_dummies(y_test).to_numpy())
+        y_test_bin = pd.get_dummies(y_test).to_numpy()
+        n_classes = y_test_bin.shape[1]
+
+        # From the sckict learn site
+        # https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+        for i in range(n_classes):
+            fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_score[:, i])
+            roc_auc[i] = auc(fpr[i], tpr[i])
+        # print(pd.get_dummies(y_test).to_numpy().ravel())
+
+        # print("\n\n********************************\n\n")
+        # print(y_pred_score.ravel())
+        # Compute micro-average ROC curve and ROC area
+        fpr["micro"], tpr["micro"], _ = roc_curve(y_test_bin.ravel(), y_pred_score.ravel())
+
+        roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+        lw = 2
+
         str_classes= ['No','Yes']
         colors = cycle(['magenta', 'darkorange'])
         for i, color in zip(range(n_classes), colors):
