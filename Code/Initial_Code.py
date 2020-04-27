@@ -24,7 +24,7 @@ import numpy as np
 from numpy.polynomial.polynomial import polyfit
 
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
@@ -1617,11 +1617,12 @@ class DecisionTree(QMainWindow):
         # Graph - 3 Feature Importances
         #####################################
         # get feature importances
+
         importances = self.clf_dt.feature_importances_
 
         # convert the importances into one-dimensional 1darray with corresponding df column names as axis labels
         f_importances = pd.Series(importances, X_dt.columns)
-
+        #print(f_importances)
         # sort the array in descending order of the importances
         f_importances.sort_values(ascending=False, inplace=True)
         f_importances=f_importances[0:10]
@@ -1946,7 +1947,7 @@ class LogisticRegressionClassifier(QMainWindow):
 
         self.canvas3.updateGeometry()
 
-        self.groupBoxG3 = QGroupBox('Importance of Features')
+        self.groupBoxG3 = QGroupBox('Cross Validation Score')
         self.groupBoxG3Layout = QVBoxLayout()
         self.groupBoxG3.setLayout(self.groupBoxG3Layout)
         self.groupBoxG3Layout.addWidget(self.canvas3)
@@ -2214,37 +2215,22 @@ class LogisticRegressionClassifier(QMainWindow):
         ## Graph 2 - ROC Curve
         #::----------------------------------------
 
+        scores_arr = []
+        #feature_arr = []
+        for val in (X_train.columns):
+            #print(val)
+            cvs_X = X_train[val].values.reshape(-1, 1)
+            #print(cvs_X)
+            scores = cross_val_score(self.clf_lr, cvs_X, y_train, cv=3)
+            scores_arr.append(scores.mean())
 
+        #importances = self.clf_knn.feature_importances_
 
-        self.fig2.tight_layout()
-        self.fig2.canvas.draw_idle()
-        ######################################
-        # Graph - 3 Feature Importances
-        #####################################
-        # get feature importances
-        #importances = self.clf_lr.feature_importances_
-        columns=X_train.columns.tolist()
-        print(self.clf_lr)
-        #print(self.clf_lr.intercept_)
-
-        importance = self.clf_lr.coef_[0]
-        # summarize feature importance
-        for i, v in enumerate(importance):
-            print('Feature: %0d, Score: %.5f' % (i, v))
-        # plot feature importance
-        #pyplot.bar([x for x in range(len(importance))], importance)
-        #pyplot.show()
-        #print(np.array([columns[1:-1]]).T)
-        #print(self.clf_lr.coef_.T)
-        f_importances = pd.DataFrame(np.hstack((np.array([columns[1:-1]]).T, self.clf_lr.coef_.T)), columns=['feature', 'importance'])
-        f_importances['importance'] = pd.to_numeric(f_importances['importance'])
-        f_importances.sort_values(by='importance', ascending=False, inplace=True)
         # convert the importances into one-dimensional 1darray with corresponding df column names as axis labels
-        #f_importances = pd.Series(importances, X_dt.columns)
-
+        f_importances = pd.Series(scores_arr, X_train.columns)
         # sort the array in descending order of the importances
-        #f_importances.sort_values(ascending=False, inplace=True)
-        f_importances=f_importances[0:10]
+        f_importances.sort_values(ascending=False, inplace=True)
+        f_importances=f_importances[0:20]
         X_Features = f_importances.index
         y_Importance = list(f_importances)
 
@@ -2511,10 +2497,10 @@ class KNNClassifier(QMainWindow):
         #self.other_modelsLayout = QFormLayout()
         #self.other_models.setLayout(self.other_modelsLayout)
         self.txtAccuracy_rf = QLineEdit()
-        self.txtAccuracy_knn = QLineEdit()
+        self.txtAccuracy_lr = QLineEdit()
         self.txtAccuracy_dt = QLineEdit()
         self.other_models.layout.addRow('Random Forest:', self.txtAccuracy_rf)
-        self.other_models.layout.addRow('Logistic Regression:', self.txtAccuracy_knn)
+        self.other_models.layout.addRow('Logistic Regression:', self.txtAccuracy_lr)
         self.other_models.layout.addRow('Decision Trees:', self.txtAccuracy_dt)
 
         self.groupBox3Layout.addWidget(self.lbl_summary)
@@ -2574,7 +2560,7 @@ class KNNClassifier(QMainWindow):
 
         self.canvas3.updateGeometry()
 
-        self.groupBoxG3 = QGroupBox('Importance of Features')
+        self.groupBoxG3 = QGroupBox('Cross Validation Score')
         self.groupBoxG3Layout = QVBoxLayout()
         self.groupBoxG3.setLayout(self.groupBoxG3Layout)
         self.groupBoxG3Layout.addWidget(self.canvas3)
@@ -2863,14 +2849,23 @@ class KNNClassifier(QMainWindow):
         # Graph - 3 Feature Importances
         #####################################
         # get feature importances
-        importances = self.clf_knn.feature_importances_
+
+        scores_arr = []
+        #feature_arr = []
+        for val in (X_train.columns):
+            #print(val)
+            cvs_X = X_train[val].values.reshape(-1, 1)
+            #print(cvs_X)
+            scores = cross_val_score(self.clf_knn, cvs_X, y_train, cv=3)
+            scores_arr.append(scores.mean())
+
+        #importances = self.clf_knn.feature_importances_
 
         # convert the importances into one-dimensional 1darray with corresponding df column names as axis labels
-        f_importances = pd.Series(importances, X_dt.columns)
-
+        f_importances = pd.Series(scores_arr, X_train.columns)
         # sort the array in descending order of the importances
         f_importances.sort_values(ascending=False, inplace=True)
-        f_importances=f_importances[0:10]
+        f_importances=f_importances[0:20]
         X_Features = f_importances.index
         y_Importance = list(f_importances)
 
