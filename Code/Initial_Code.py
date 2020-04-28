@@ -1,5 +1,5 @@
 import sys,os
-os.chdir("/Users/utkarshvirendranigam/Desktop/Homework/Project")
+#os.chdir("/Users/utkarshvirendranigam/Desktop/Homework/Project")
 #from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QAction, QComboBox, QLabel, QGridLayout, QCheckBox, QGroupBox
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget, QPushButton, QAction, QComboBox, QLabel,
                              QGridLayout, QCheckBox, QGroupBox, QVBoxLayout, QHBoxLayout, QLineEdit, QPlainTextEdit)
@@ -3263,6 +3263,11 @@ class App(QMainWindow):
         self.width = 1000
         self.height = 500
         self.Title = 'Attrition Predictor'
+        label = QLabel(self)
+        pixmap = QPixmap('cat.png')
+        label.setPixmap(pixmap)
+        self.setCentralWidget(label)
+        self.resize(pixmap.width(), pixmap.height())
         self.initUI()
 
     def initUI(self):
