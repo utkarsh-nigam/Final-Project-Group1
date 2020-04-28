@@ -99,29 +99,35 @@ class VariableDistribution(QMainWindow):
         self.canvas.updateGeometry()
         self.featuresList=personal_features
         self.dropdown1 = QComboBox()
-        self.dropdown1.addItems(["Personal", "Organisation", "Commution", "Satisfaction"])
+        self.dropdown1.addItems(["Personal", "Organisation", "Commution"])
         self.dropdown1.currentIndexChanged.connect(self.updateCategory)
         self.dropdown2 = QComboBox()
         self.label = QLabel("A plot:")
         self.filter_data = QWidget(self)
         self.filter_data.layout = QGridLayout(self.filter_data)
 
+        self.filter_data.layout.addWidget(QLabel("Choose Data Filter:"), 0, 0, 1, 1)
+
         self.filter_radio_button = QRadioButton("All Data")
         self.filter_radio_button.setChecked(True)
         self.filter_radio_button.filter = "All_Data"
-        self.set_Filter="All_Data"
+        self.set_Filter = "All_Data"
         self.filter_radio_button.toggled.connect(self.onFilterClicked)
-        self.filter_data.layout.addWidget(self.filter_radio_button, 0, 0)
+        self.filter_data.layout.addWidget(self.filter_radio_button, 0, 1, 1, 1)
 
         self.filter_radio_button = QRadioButton("Attrition: Yes")
         self.filter_radio_button.filter = "Yes"
         self.filter_radio_button.toggled.connect(self.onFilterClicked)
-        self.filter_data.layout.addWidget(self.filter_radio_button, 0, 1)
+        self.filter_data.layout.addWidget(self.filter_radio_button, 0, 2, 1, 1)
 
         self.filter_radio_button = QRadioButton("Attrition: No")
         self.filter_radio_button.filter = "No"
         self.filter_radio_button.toggled.connect(self.onFilterClicked)
-        self.filter_data.layout.addWidget(self.filter_radio_button, 0, 2)
+        self.filter_data.layout.addWidget(self.filter_radio_button, 0, 3, 1, 1)
+
+        self.btnCreateGraph = QPushButton("Create Graph")
+        self.btnCreateGraph.clicked.connect(self.update)
+        self.filter_data.layout.addWidget(self.btnCreateGraph, 1, 0, 4, 1)
 
 
         self.groupBox1 = QGroupBox('Distribution')
@@ -139,18 +145,17 @@ class VariableDistribution(QMainWindow):
 
 
         self.layout = QGridLayout(self.main_widget)
-        self.layout.addWidget(QLabel("Select Feature Category:"),0,0,1,1)
-        self.layout.addWidget(self.dropdown1,0,1,1,1)
-        self.layout.addWidget(QLabel(""), 0, 2, 1, 1)
-        self.layout.addWidget(QLabel("Select Features:"),0,3,1,1)
-        self.layout.addWidget(self.dropdown2,0,4,1,1)
-        self.layout.addWidget(QLabel(""), 0, 5, 1, 1)
-        self.layout.addWidget(QLabel("Choose Data Filter:"), 0, 6, 1, 1)
-        self.layout.addWidget(self.filter_data,0,7,1,2)
-        self.layout.addWidget(self.groupBox1,1,0,5,5)
-        self.layout.addWidget(QLabel(""), 1, 5, 5, 1)
-        self.layout.addWidget(self.groupBox2, 1, 6, 5, 3)
-
+        self.layout.addWidget(QLabel("Select Feature Category:"),0,0,2,1)
+        self.layout.addWidget(self.dropdown1,0,1,2,1)
+        self.layout.addWidget(QLabel(""), 0, 2, 2, 1)
+        self.layout.addWidget(QLabel("Select Features:"),0,3,2,1)
+        self.layout.addWidget(self.dropdown2,0,4,2,1)
+        self.layout.addWidget(QLabel(""), 0, 5, 2, 1)
+        self.layout.addWidget(QLabel("Choose Data Filter:"), 0, 6, 2, 1)
+        self.layout.addWidget(self.filter_data,0,7,2,2)
+        self.layout.addWidget(self.groupBox1,2,0,5,5)
+        self.layout.addWidget(QLabel(""), 2, 5, 5, 1)
+        self.layout.addWidget(self.groupBox2, 2, 6, 5, 3)
 
         self.setCentralWidget(self.main_widget)
         self.resize(1400, 700)
@@ -166,11 +171,9 @@ class VariableDistribution(QMainWindow):
             self.featuresList = list(set(continuous_features) & set(organisation_features))
         elif (feature_category == "Commution"):
             self.featuresList = list(set(continuous_features) & set(commution_features))
-        elif (feature_category == "Satisfaction"):
-            self.featuresList = list(set(continuous_features) & set(satisfaction_features))
+        del feature_category
         self.dropdown2.addItems(self.featuresList)
-        self.dropdown2.currentIndexChanged.connect(self.update)
-        self.update()
+        del self.featuresList
 
     def onFilterClicked(self):
         self.filter_radio_button = self.sender()
@@ -194,17 +197,15 @@ class VariableDistribution(QMainWindow):
         else:
             self.filtered_data = attr_data.copy()
 
-        X = self.filtered_data[cat1]
-        #X_1 = attr_data["Happiness.Score"]
-        #y_1 = ff_happiness[cat1]
-        vtitle = cat1
-        self.ax.hist(X, bins=10, facecolor='green', alpha=0.5)
-        self.ax.set_title(vtitle)
+        self.ax.hist(self.filtered_data[cat1], bins=10, facecolor='green', alpha=0.5)
+        self.ax.set_title(cat1)
         self.ax.set_xlabel(cat1)
         self.ax.set_ylabel("Count")
         self.ax.grid(True)
         self.fig.tight_layout()
         self.fig.canvas.draw_idle()
+        del cat1
+        del self.filtered_data
 
 
 class VariableRelation(QMainWindow):
@@ -461,6 +462,192 @@ class VariableRelation(QMainWindow):
         self.fig.canvas.draw_idle()
 
 
+class AttritionRelation(QMainWindow):
+    #::---------------------------------------------------------
+    # This class crates a canvas with a plot to show the relation
+    # from each feature in the dataset with the happiness score
+    # methods
+    #    _init_
+    #   update
+    #::---------------------------------------------------------
+    send_fig = pyqtSignal(str)
+
+    def __init__(self):
+        #::--------------------------------------------------------
+        # Crate a canvas with the layout to draw a dotplot
+        # The layout sets all the elements and manage the changes
+        # made on the canvas
+        #::--------------------------------------------------------
+        super(AttritionRelation, self).__init__()
+
+        self.Title = "EDA: Attrition Relation"
+        self.main_widget = QWidget(self)
+
+        self.setWindowTitle(self.Title)
+        self.setStyleSheet(font_size_window)
+
+        self.fig = Figure()
+        self.ax1 = self.fig.add_subplot(1,2,1)
+        self.axes1=[self.ax1]
+        self.ax2 = self.fig.add_subplot(1, 2, 2)
+        self.axes2 = [self.ax2]
+        self.canvas = FigureCanvas(self.fig)
+
+
+        self.canvas.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Expanding)
+
+        self.canvas.updateGeometry()
+        self.featuresList=personal_features
+        self.dropdown1 = QComboBox()
+        self.dropdown1.addItems(["Personal", "Organisation", "Commution", "Satisfaction"])
+        self.dropdown1.currentIndexChanged.connect(self.updateCategory)
+        self.dropdown2 = QComboBox()
+        self.label = QLabel("A plot:")
+        self.filter_data = QWidget(self)
+        self.filter_data.layout = QGridLayout(self.filter_data)
+
+        self.groupBox1 = QGroupBox('Relation between Attrition: Yes and Attrition: No')
+        self.groupBox1Layout = QVBoxLayout()
+        self.groupBox1.setLayout(self.groupBox1Layout)
+        #self.groupBox2.setMinimumSize(400, 50)
+        self.groupBox1Layout.addWidget(self.canvas)
+
+        self.groupBox2 = QGroupBox('Summary')
+        self.groupBox2Layout = QVBoxLayout()
+        self.groupBox2.setLayout(self.groupBox2Layout)
+        # self.groupBox2.setMinimumSize(400, 50)
+        self.graph_summary = QPlainTextEdit()
+        self.groupBox2Layout.addWidget(self.graph_summary)
+
+
+        self.layout = QGridLayout(self.main_widget)
+        self.layout.addWidget(QLabel("Select Feature Category:"),0,0,1,1)
+        self.layout.addWidget(self.dropdown1,0,1,1,1)
+        self.layout.addWidget(QLabel(""), 0, 2, 1, 1)
+        self.layout.addWidget(QLabel("Select Features:"),0,3,1,1)
+        self.layout.addWidget(self.dropdown2,0,4,1,1)
+        self.layout.addWidget(QLabel(""), 0, 5, 1, 4)
+        #self.layout.addWidget(QLabel("Choose Data Filter:"), 0, 6, 1, 1)
+        #self.layout.addWidget(self.filter_data,0,7,1,2)
+        self.layout.addWidget(self.groupBox1,1,0,5,5)
+        self.layout.addWidget(QLabel(""), 1, 5, 5, 1)
+        self.layout.addWidget(self.groupBox2, 1, 6, 5, 3)
+
+
+        self.setCentralWidget(self.main_widget)
+        self.resize(1400, 700)
+        self.show()
+        self.updateCategory()
+
+    def updateCategory(self):
+        self.dropdown2.clear()
+        feature_category = self.dropdown1.currentText()
+        if(feature_category=="Personal"):
+            self.featuresList=list(set(continuous_features) & set(personal_features))
+        elif (feature_category == "Organisation"):
+            self.featuresList = list(set(continuous_features) & set(organisation_features))
+        elif (feature_category == "Commution"):
+            self.featuresList = list(set(continuous_features) & set(commution_features))
+        elif (feature_category == "Satisfaction"):
+            self.featuresList = list(set(continuous_features) & set(satisfaction_features))
+        self.dropdown2.addItems(self.featuresList)
+        self.dropdown2.currentIndexChanged.connect(self.update)
+        self.update()
+
+    def onFilterClicked(self):
+        self.filter_radio_button = self.sender()
+        if self.filter_radio_button.isChecked():
+            self.set_Filter=self.filter_radio_button.filter
+            self.update()
+
+    def update(self):
+        #::--------------------------------------------------------
+        # This method executes each time a change is made on the canvas
+        # containing the elements of the graph
+        # The purpose of the method es to draw a dot graph using the
+        # score of happiness and the feature chosen the canvas
+        #::--------------------------------------------------------
+        colors=["b", "r", "g", "y", "k", "c"]
+        self.ax1.clear()
+        self.ax2.clear()
+        self.filtered_data = attr_data.copy()
+        graph_feature1 = self.dropdown2.currentText()
+        val1 = []
+        val2 = []
+        if (graph_feature1 in categorical_features):
+            self.filtered_data["Count"]=1
+            category_values=self.filtered_data[graph_feature1].unique()
+
+            yes_data=self.filtered_data[self.filtered_data["Attrition"]=="Yes"]
+            no_data=self.filtered_data[self.filtered_data["Attrition"]=="No"]
+
+            my_pt_yes = pd.pivot_table(yes_data, index=graph_feature1, values="Count",aggfunc=np.sum)
+            my_pt_yes = pd.DataFrame(my_pt_yes.to_records())
+            my_dict_yes=dict(zip(my_pt_yes.index, my_pt_yes["Count"]))
+
+            my_pt_no = pd.pivot_table(no_data, index=graph_feature1, values="Count", aggfunc=np.sum)
+            my_pt_no = pd.DataFrame(my_pt_no.to_records())
+            my_dict_no = dict(zip(my_pt_no.index, my_pt_no["Count"]))
+
+            for temp_value in category_values:
+                if temp_value in my_dict_yes.keys():
+                    val1.append(-1*(my_dict_yes[temp_value]))
+                else:
+                    val1.append(0)
+
+                if temp_value in my_dict_no.keys():
+                    val2.append(my_dict_no[temp_value])
+                else:
+                    val1.append(0)
+
+        else:
+            yes_data = self.filtered_data[self.filtered_data["Attrition"] == "Yes"]
+            no_data = self.filtered_data[self.filtered_data["Attrition"] == "No"]
+
+            category_values=["Min","Max","Mean","Median"]
+            val1.append(-1*(yes_data[graph_feature1].min()))
+            val1.append(-1 * (yes_data[graph_feature1].mean(skipna = True)))
+            val1.append(-1 * (yes_data[graph_feature1].median(skipna = True)))
+            val1.append(-1 * (yes_data[graph_feature1].max()))
+
+            val2.append(no_data[graph_feature1].min())
+            val2.append(no_data[graph_feature1].mean(skipna=True))
+            val2.append(no_data[graph_feature1].median(skipna=True))
+            val2.append(no_data[graph_feature1].max())
+
+
+        cat=["A","B","C","D","E"]
+
+        val1=[-45,-67,-32,-100,-64]
+        val2 = [23, 82, 35,45,73]
+
+        cat1 = self.dropdown2.currentText()
+        #if (self.set_Filter=="Yes" or self.set_Filter=="No"):
+            #self.filtered_data=attr_data.copy()
+            #self.filtered_data = self.filtered_data[self.filtered_data["Attrition"]==self.set_Filter]
+        #else:
+        self.filtered_data = attr_data.copy()
+
+        X = self.filtered_data[cat1]
+        #X_1 = attr_data["Happiness.Score"]
+        #y_1 = ff_happiness[cat1]
+        vtitle = cat1
+        self.ax1.barh(cat, val1, color='blue')
+        self.ax1.set_title("Attrition: No")
+        self.ax1.axis('off')
+        #self.ax1.set_xlabel(cat1)
+        #self.ax1.set_ylabel("Count")
+        self.ax1.grid(False)
+
+        self.ax2.barh(cat, val2, color='red')
+        self.ax2.set_title("Attrition: Yes")
+        self.ax2.axis('off')
+        #self.ax2.set_xlabel(cat1)
+        #self.ax2.set_ylabel("Count")
+        self.ax2.grid(False)
+
+        self.fig.tight_layout()
+        self.fig.canvas.draw_idle()
 
 
 class RandomForest(QMainWindow):
@@ -3059,6 +3246,7 @@ class App(QMainWindow):
         EDAMenu = mainMenu.addMenu('EDA Analysis')
         MLModelMenu = mainMenu.addMenu('ML Models')
 
+
         #::--------------------------------------
         # Exit application
         # Creates the actions for the fileMenu item
@@ -3089,8 +3277,8 @@ class App(QMainWindow):
         EDA2Button.triggered.connect(self.EDA2)
         EDAMenu.addAction(EDA2Button)
 
-        EDA4Button = QAction(QIcon('analysis.png'), 'Correlation Plot', self)
-        EDA4Button.setStatusTip('Features Correlation Plot')
+        EDA4Button = QAction(QIcon('analysis.png'), 'Attrition Relation', self)
+        EDA4Button.setStatusTip('Compares the variables with respect to Attrition')
         EDA4Button.triggered.connect(self.EDA4)
         EDAMenu.addAction(EDA4Button)
 
@@ -3159,7 +3347,7 @@ class App(QMainWindow):
         #::----------------------------------------------------------
         # This function creates an instance of the CorrelationPlot class
         #::----------------------------------------------------------
-        dialog = CorrelationPlot()
+        dialog = AttritionRelation()
         self.dialogs.append(dialog)
         dialog.show()
 
@@ -3251,9 +3439,9 @@ def attrition_data():
     hot_encoder_variables=["BusinessTravel","Department","EducationField","Gender","JobRole","MaritalStatus","OverTime","StockOptionLevel"]
     personal_features=["Age","Education","EducationField","MaritalStatus","Gender"]
     organisation_features=["DailyRate","Department","HourlyRate","JobInvolvement","JobLevel","JobRole","MonthlyIncome","MonthlyRate","NumCompaniesWorked","OverTime","PercentSalaryHike","PerformanceRating","StockOptionLevel","TotalWorkingYears","TrainingTimesLastYear","YearsAtCompany","YearsInCurrentRole","YearsSinceLastPromotion","YearsWithCurrManager"]
-    commution_features=["BusinessTravel","DistanceFromHome",""]
+    commution_features=["BusinessTravel","DistanceFromHome"]
     satisfaction_features=["EnvironmentSatisfaction","JobSatisfaction","RelationshipSatisfaction","WorkLifeBalance"]
-    continuous_features=["Age","DailyRate","HourlyRate","MonthlyIncome","MonthlyRate","NumCompaniesWorked","PercentSalaryHike","TotalWorkingYears","TrainingTimesLastYear","YearsAtCompany","YearsInCurrentRole","YearsSinceLastPromotion","YearsWithCurrManager"]
+    continuous_features=["Age","DistanceFromHome","DailyRate","HourlyRate","MonthlyIncome","MonthlyRate","NumCompaniesWorked","PercentSalaryHike","TotalWorkingYears","TrainingTimesLastYear","YearsAtCompany","YearsInCurrentRole","YearsSinceLastPromotion","YearsWithCurrManager"]
     categorical_features=list(set(features_list) - set(continuous_features))
 
 if __name__ == '__main__':
