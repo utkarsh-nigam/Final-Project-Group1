@@ -672,13 +672,13 @@ class AttritionRelation(QMainWindow):
             val2.append(round(no_data[graph_feature1].mean(skipna=True),1))
             val2.append(no_data[graph_feature1].min())
 
-        self.ax1.barh(category_values, val1, color='blue',height=0.3)
-        self.ax1.set_title("Attrition: No")
+        self.ax1.barh(category_values, val1, color='red',height=0.3)
+        self.ax1.set_title("Attrition: Yes")
         self.ax1.axis('off')
         self.ax1.grid(False)
 
-        self.ax2.barh(category_values, val2, color='red', height=0.3)
-        self.ax2.set_title("Attrition: Yes")
+        self.ax2.barh(category_values, val2, color='blue', height=0.3)
+        self.ax2.set_title("Attrition: No")
         self.ax2.axis('off')
         #self.ax2.set_xlabel(cat1)
         #self.ax2.set_ylabel("Count")
