@@ -505,8 +505,10 @@ class AttritionRelation(QMainWindow):
         self.label = QLabel("A plot:")
         self.filter_data = QWidget(self)
         self.filter_data.layout = QGridLayout(self.filter_data)
+        self.btnCreateGraph = QPushButton("Create Graph")
+        self.btnCreateGraph.clicked.connect(self.update)
 
-        self.groupBox1 = QGroupBox('Relation between Attrition: Yes and Attrition: No')
+        self.groupBox1 = QGroupBox('Relation between Attrition: Yes and No')
         self.groupBox1Layout = QVBoxLayout()
         self.groupBox1.setLayout(self.groupBox1Layout)
         #self.groupBox2.setMinimumSize(400, 50)
@@ -526,13 +528,13 @@ class AttritionRelation(QMainWindow):
         self.layout.addWidget(QLabel(""), 0, 2, 1, 1)
         self.layout.addWidget(QLabel("Select Features:"),0,3,1,1)
         self.layout.addWidget(self.dropdown2,0,4,1,1)
-        self.layout.addWidget(QLabel(""), 0, 5, 1, 4)
+        self.layout.addWidget(QLabel(""), 0, 5, 1, 3)
+        self.layout.addWidget(self.btnCreateGraph, 0, 8, 1, 1)
         #self.layout.addWidget(QLabel("Choose Data Filter:"), 0, 6, 1, 1)
         #self.layout.addWidget(self.filter_data,0,7,1,2)
         self.layout.addWidget(self.groupBox1,1,0,5,5)
         self.layout.addWidget(QLabel(""), 1, 5, 5, 1)
         self.layout.addWidget(self.groupBox2, 1, 6, 5, 3)
-
 
         self.setCentralWidget(self.main_widget)
         self.resize(1400, 700)
@@ -543,22 +545,16 @@ class AttritionRelation(QMainWindow):
         self.dropdown2.clear()
         feature_category = self.dropdown1.currentText()
         if(feature_category=="Personal"):
-            self.featuresList=list(set(continuous_features) & set(personal_features))
+            self.featuresList=personal_features
         elif (feature_category == "Organisation"):
-            self.featuresList = list(set(continuous_features) & set(organisation_features))
+            self.featuresList = organisation_features
         elif (feature_category == "Commution"):
-            self.featuresList = list(set(continuous_features) & set(commution_features))
+            self.featuresList = commution_features
         elif (feature_category == "Satisfaction"):
-            self.featuresList = list(set(continuous_features) & set(satisfaction_features))
+            self.featuresList = satisfaction_features
         self.dropdown2.addItems(self.featuresList)
-        self.dropdown2.currentIndexChanged.connect(self.update)
-        self.update()
 
-    def onFilterClicked(self):
-        self.filter_radio_button = self.sender()
-        if self.filter_radio_button.isChecked():
-            self.set_Filter=self.filter_radio_button.filter
-            self.update()
+
 
     def update(self):
         #::--------------------------------------------------------
@@ -583,12 +579,11 @@ class AttritionRelation(QMainWindow):
 
             my_pt_yes = pd.pivot_table(yes_data, index=graph_feature1, values="Count",aggfunc=np.sum)
             my_pt_yes = pd.DataFrame(my_pt_yes.to_records())
-            my_dict_yes=dict(zip(my_pt_yes.index, my_pt_yes["Count"]))
+            my_dict_yes=dict(zip(my_pt_yes[graph_feature1], my_pt_yes["Count"]))
 
             my_pt_no = pd.pivot_table(no_data, index=graph_feature1, values="Count", aggfunc=np.sum)
             my_pt_no = pd.DataFrame(my_pt_no.to_records())
-            my_dict_no = dict(zip(my_pt_no.index, my_pt_no["Count"]))
-
+            my_dict_no = dict(zip(my_pt_no[graph_feature1], my_pt_no["Count"]))
             for temp_value in category_values:
                 if temp_value in my_dict_yes.keys():
                     val1.append(-1*(my_dict_yes[temp_value]))
@@ -598,48 +593,32 @@ class AttritionRelation(QMainWindow):
                 if temp_value in my_dict_no.keys():
                     val2.append(my_dict_no[temp_value])
                 else:
-                    val1.append(0)
+                    val2.append(0)
 
         else:
             yes_data = self.filtered_data[self.filtered_data["Attrition"] == "Yes"]
             no_data = self.filtered_data[self.filtered_data["Attrition"] == "No"]
 
-            category_values=["Min","Max","Mean","Median"]
-            val1.append(-1*(yes_data[graph_feature1].min()))
-            val1.append(-1 * (yes_data[graph_feature1].mean(skipna = True)))
-            val1.append(-1 * (yes_data[graph_feature1].median(skipna = True)))
+            category_values=["Max","Median","Mean","Min"]
             val1.append(-1 * (yes_data[graph_feature1].max()))
+            val1.append(-1 * (yes_data[graph_feature1].median(skipna=True)))
+            val1.append(-1 * (yes_data[graph_feature1].mean(skipna=True)))
+            val1.append(-1*(yes_data[graph_feature1].min()))
 
-            val2.append(no_data[graph_feature1].min())
-            val2.append(no_data[graph_feature1].mean(skipna=True))
-            val2.append(no_data[graph_feature1].median(skipna=True))
             val2.append(no_data[graph_feature1].max())
+            val2.append(no_data[graph_feature1].median(skipna=True))
+            val2.append(no_data[graph_feature1].mean(skipna=True))
+            val2.append(no_data[graph_feature1].min())
 
 
-        cat=["A","B","C","D","E"]
-
-        val1=[-45,-67,-32,-100,-64]
-        val2 = [23, 82, 35,45,73]
-
-        cat1 = self.dropdown2.currentText()
-        #if (self.set_Filter=="Yes" or self.set_Filter=="No"):
-            #self.filtered_data=attr_data.copy()
-            #self.filtered_data = self.filtered_data[self.filtered_data["Attrition"]==self.set_Filter]
-        #else:
-        self.filtered_data = attr_data.copy()
-
-        X = self.filtered_data[cat1]
-        #X_1 = attr_data["Happiness.Score"]
-        #y_1 = ff_happiness[cat1]
-        vtitle = cat1
-        self.ax1.barh(cat, val1, color='blue')
+        self.ax1.barh(category_values, val1, color='blue')
         self.ax1.set_title("Attrition: No")
         self.ax1.axis('off')
         #self.ax1.set_xlabel(cat1)
         #self.ax1.set_ylabel("Count")
         self.ax1.grid(False)
 
-        self.ax2.barh(cat, val2, color='red')
+        self.ax2.barh(category_values, val2, color='red')
         self.ax2.set_title("Attrition: Yes")
         self.ax2.axis('off')
         #self.ax2.set_xlabel(cat1)
