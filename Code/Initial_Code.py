@@ -1,5 +1,5 @@
 import sys,os
-os.chdir("/Users/utkarshvirendranigam/Desktop/Homework/Project")
+#os.chdir("/Users/utkarshvirendranigam/Desktop/Homework/Project")
 #from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QAction, QComboBox, QLabel, QGridLayout, QCheckBox, QGroupBox
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget, QPushButton, QAction, QComboBox, QLabel,
                              QGridLayout, QCheckBox, QGroupBox, QVBoxLayout, QHBoxLayout, QLineEdit, QPlainTextEdit)
@@ -3328,7 +3328,12 @@ class App(QMainWindow):
         self.top = 200
         self.width = 1000
         self.height = 500
-        self.Title = 'Attrition Predictor'
+        self.Title = 'Predict Employee Attrition '
+        label = QLabel(self)
+        pixmap = QPixmap('EM.png')
+        label.setPixmap(pixmap)
+        self.setCentralWidget(label)
+        self.resize(pixmap.width(), pixmap.height())
         self.initUI()
 
     def initUI(self):
@@ -3501,6 +3506,7 @@ def main():
     app.setStyle('Fusion')
     ex = App()
     ex.show()
+    ex.showMaximized()
     sys.exit(app.exec_())
 
 
