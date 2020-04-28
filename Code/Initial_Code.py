@@ -3440,6 +3440,7 @@ def main():
     app.setStyle('Fusion')
     ex = App()
     ex.show()
+    ex.showMaximized()
     sys.exit(app.exec_())
 
 
