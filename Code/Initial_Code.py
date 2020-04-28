@@ -207,6 +207,7 @@ class VariableDistribution(QMainWindow):
         del self.filtered_data
 
 
+
 class VariableRelation(QMainWindow):
     #::---------------------------------------------------------
     # This class crates a canvas with a plot to show the relation
@@ -240,8 +241,8 @@ class VariableRelation(QMainWindow):
         self.canvas.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Expanding)
 
         self.canvas.updateGeometry()
-        self.featuresList1 = personal_features
-        self.featuresList2 = personal_features
+        self.featuresList1 = personal_features.copy()
+        self.featuresList2 = personal_features.copy()
 
 
 
@@ -254,6 +255,7 @@ class VariableRelation(QMainWindow):
         self.dropdown1.currentIndexChanged.connect(self.updateCategory1)
         self.dropdown2 = QComboBox()
         self.dropdown2.addItems(self.featuresList1)
+        self.dropdown2.currentIndexChanged.connect(self.updateCategory2)
         self.filterBox1Layout.addWidget(QLabel("Select Feature Category:"),0,0)
         self.filterBox1Layout.addWidget(self.dropdown1,0,1)
         self.filterBox1Layout.addWidget(QLabel("Select Feature:"),1,0)
@@ -339,35 +341,41 @@ class VariableRelation(QMainWindow):
         self.setCentralWidget(self.main_widget)
         self.resize(1400, 700)
         self.show()
-        self.updateCategory1()
         self.updateCategory2()
-
 
     def updateCategory1(self):
         self.dropdown2.clear()
         feature_category1 = self.dropdown1.currentText()
         if(feature_category1=="Personal"):
-            self.featuresList1=personal_features
+            self.featuresList1=personal_features.copy()
         elif (feature_category1 == "Organisation"):
-            self.featuresList1 = organisation_features
+            self.featuresList1 = organisation_features.copy()
         elif (feature_category1 == "Commution"):
-            self.featuresList1 = commution_features
+            self.featuresList1 = commution_features.copy()
         elif (feature_category1 == "Satisfaction"):
-            self.featuresList1 = satisfaction_features
+            self.featuresList1 = satisfaction_features.copy()
         self.dropdown2.addItems(self.featuresList1)
+
 
     def updateCategory2(self):
         self.dropdown4.clear()
         feature_category2 = self.dropdown3.currentText()
         if (feature_category2 == "Personal"):
-            self.featuresList2 = personal_features
+            self.featuresList2 = personal_features.copy()
         elif (feature_category2 == "Organisation"):
-            self.featuresList2 = organisation_features
+            self.featuresList2 = organisation_features.copy()
         elif (feature_category2 == "Commution"):
-            self.featuresList2 = commution_features
+            self.featuresList2 = commution_features.copy()
         elif (feature_category2 == "Satisfaction"):
-            self.featuresList2 = satisfaction_features
+            self.featuresList2 = satisfaction_features.copy()
+        #print(self.dropdown2.currentText())
+        #print(self.featuresList2)
+        #print()
+        if(self.dropdown2.currentText() in self.featuresList2):
+            self.featuresList2.remove(self.dropdown2.currentText())
+        #print(self.featuresList2)
         self.dropdown4.addItems(self.featuresList2)
+
 
     def onFilterClicked(self):
         self.filter_radio_button = self.sender()
