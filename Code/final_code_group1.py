@@ -1,5 +1,5 @@
 import sys,os
-os.chdir("/Users/utkarshvirendranigam/Desktop/Homework/Project")
+#os.chdir("/Users/utkarshvirendranigam/Desktop/Homework/Project")
 required_packages=["PyQt5","scipy","itertools","random","matplotlib","pandas","numpy","sklearn","pydotplus","collections","warnings","seaborn"]
 
 print(os.getcwd())
