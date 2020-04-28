@@ -732,7 +732,7 @@ class RandomForest(QMainWindow):
         self.txtPercentTest = QLineEdit(self)
         self.txtPercentTest.setText("20")
 
-        self.lblEstimatorCount = QLabel('Neighbours:')
+        self.lblEstimatorCount = QLabel('Number of Trees:')
         self.lblEstimatorCount.adjustSize()
 
         self.txtEstimatorCount = QLineEdit(self)
@@ -1044,8 +1044,29 @@ class RandomForest(QMainWindow):
                 self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[19]]], axis=1)
 
 
-        vtest_per = float(self.txtPercentTest.text())
-        estimator_input = round(float(self.txtEstimatorCount.text()))
+        try:
+            vtest_per = float(self.txtPercentTest.text())
+            if(vtest_per<100 and vtest_per>0):
+                pass
+            else:
+                vtest_per = 20
+                self.txtPercentTest.setText(str(vtest_per))
+        except:
+            vtest_per=20
+            self.txtPercentTest.setText(str(vtest_per))
+
+
+        try:
+            estimator_input = round(float(self.txtEstimatorCount.text()))
+            if (estimator_input < 1000 and estimator_input > 0):
+                pass
+            else:
+                estimator_input = 35
+                self.txtEstimatorCount.setText(str(estimator_input))
+        except:
+            estimator_input=35
+            self.txtEstimatorCount.setText(str(estimator_input))
+
 
         # Clear the graphs to populate them with the new information
 
@@ -1670,7 +1691,16 @@ class DecisionTree(QMainWindow):
                 self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[19]]], axis=1)
 
 
-        vtest_per = float(self.txtPercentTest.text())
+        try:
+            vtest_per = float(self.txtPercentTest.text())
+            if(vtest_per<100 and vtest_per>0):
+                pass
+            else:
+                vtest_per = 20
+                self.txtPercentTest.setText(str(vtest_per))
+        except:
+            vtest_per=20
+            self.txtPercentTest.setText(str(vtest_per))
 
         # Clear the graphs to populate them with the new information
 
@@ -2299,7 +2329,16 @@ class LogisticRegressionClassifier(QMainWindow):
                 self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[19]]], axis=1)
 
 
-        vtest_per = float(self.txtPercentTest.text())
+        try:
+            vtest_per = float(self.txtPercentTest.text())
+            if(vtest_per<100 and vtest_per>0):
+                pass
+            else:
+                vtest_per = 20
+                self.txtPercentTest.setText(str(vtest_per))
+        except:
+            vtest_per=20
+            self.txtPercentTest.setText(str(vtest_per))
 
         # Clear the graphs to populate them with the new information
 
@@ -2924,8 +2963,27 @@ class KNNClassifier(QMainWindow):
                 self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[19]]], axis=1)
 
 
-        vtest_per = float(self.txtPercentTest.text())
-        neighbour_input = round(float(self.txtNeighbourCount.text()))
+        try:
+            vtest_per = float(self.txtPercentTest.text())
+            if(vtest_per<100 and vtest_per>0):
+                pass
+            else:
+                vtest_per = 20
+                self.txtPercentTest.setText(str(vtest_per))
+        except:
+            vtest_per=20
+            self.txtPercentTest.setText(str(vtest_per))
+
+        try:
+            neighbour_input = round(float(self.txtNeighbourCount.text()))
+            if (neighbour_input < 100 and neighbour_input > 0):
+                pass
+            else:
+                neighbour_input = 9
+                self.txtNeighbourCount.setText(str(neighbour_input))
+        except:
+            neighbour_input=9
+            self.txtNeighbourCount.setText(str(neighbour_input))
 
         # Clear the graphs to populate them with the new information
 
