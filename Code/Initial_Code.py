@@ -3303,9 +3303,9 @@ class App(QMainWindow):
         self.top = 200
         self.width = 1000
         self.height = 500
-        self.Title = 'Attrition Predictor'
+        self.Title = 'Predict Employee Attrition'
         label = QLabel(self)
-        pixmap = QPixmap('cat.png')
+        pixmap = QPixmap('EM.png')
         label.setPixmap(pixmap)
         self.setCentralWidget(label)
         self.resize(pixmap.width(), pixmap.height())
