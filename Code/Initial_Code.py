@@ -127,7 +127,7 @@ class VariableDistribution(QMainWindow):
 
         self.btnCreateGraph = QPushButton("Create Graph")
         self.btnCreateGraph.clicked.connect(self.update)
-        self.filter_data.layout.addWidget(self.btnCreateGraph, 1, 0, 4, 1)
+        self.filter_data.layout.addWidget(self.btnCreateGraph, 1, 0, 1, 4)
 
 
         self.groupBox1 = QGroupBox('Distribution')
@@ -145,14 +145,13 @@ class VariableDistribution(QMainWindow):
 
 
         self.layout = QGridLayout(self.main_widget)
-        self.layout.addWidget(QLabel("Select Feature Category:"),0,0,2,1)
-        self.layout.addWidget(self.dropdown1,0,1,2,1)
-        self.layout.addWidget(QLabel(""), 0, 2, 2, 1)
-        self.layout.addWidget(QLabel("Select Features:"),0,3,2,1)
-        self.layout.addWidget(self.dropdown2,0,4,2,1)
-        self.layout.addWidget(QLabel(""), 0, 5, 2, 1)
-        self.layout.addWidget(QLabel("Choose Data Filter:"), 0, 6, 2, 1)
-        self.layout.addWidget(self.filter_data,0,7,2,2)
+        self.layout.addWidget(QLabel("Select Feature Category:"),0,0,1,1)
+        self.layout.addWidget(self.dropdown1,0,1,1,1)
+        self.layout.addWidget(QLabel(""), 0, 2, 4, 1)
+        self.layout.addWidget(QLabel("Select Features:"),1,0,1,1)
+        self.layout.addWidget(self.dropdown2,1,1,1,1)
+        self.layout.addWidget(QLabel(""), 1, 2, 4, 1)
+        self.layout.addWidget(self.filter_data,0,6,2,3)
         self.layout.addWidget(self.groupBox1,2,0,5,5)
         self.layout.addWidget(QLabel(""), 2, 5, 5, 1)
         self.layout.addWidget(self.groupBox2, 2, 6, 5, 3)
@@ -281,6 +280,7 @@ class VariableRelation(QMainWindow):
 
 
         self.filter_data = QWidget(self)
+        self.filter_data.setWindowTitle("")
         self.filter_data.layout = QGridLayout(self.filter_data)
 
         self.filter_data.layout.addWidget(QLabel("Choose Data Filter:"), 0, 0, 1, 1)
@@ -304,7 +304,7 @@ class VariableRelation(QMainWindow):
 
         self.btnCreateGraph = QPushButton("Create Graph")
         self.btnCreateGraph.clicked.connect(self.update)
-        self.filter_data.layout.addWidget(self.btnCreateGraph, 1, 0, 4, 1)
+        self.filter_data.layout.addWidget(self.btnCreateGraph, 1, 0, 1, 4)
 
 
 
@@ -528,8 +528,8 @@ class AttritionRelation(QMainWindow):
         self.layout.addWidget(QLabel(""), 0, 2, 1, 1)
         self.layout.addWidget(QLabel("Select Features:"),0,3,1,1)
         self.layout.addWidget(self.dropdown2,0,4,1,1)
-        self.layout.addWidget(QLabel(""), 0, 5, 1, 3)
-        self.layout.addWidget(self.btnCreateGraph, 0, 8, 1, 1)
+        self.layout.addWidget(QLabel(""), 0, 5, 1, 1)
+        self.layout.addWidget(self.btnCreateGraph, 0, 6, 1, 3)
         #self.layout.addWidget(QLabel("Choose Data Filter:"), 0, 6, 1, 1)
         #self.layout.addWidget(self.filter_data,0,7,1,2)
         self.layout.addWidget(self.groupBox1,1,0,5,5)
