@@ -26,7 +26,7 @@ from numpy.polynomial.polynomial import polyfit
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
@@ -143,7 +143,19 @@ class VariableDistribution(QMainWindow):
         self.graph_summary = QPlainTextEdit()
         self.groupBox2Layout.addWidget(self.graph_summary)
 
-
+        self.layout = QGridLayout(self.main_widget)
+        self.layout.addWidget(QLabel("Select Feature Category:"), 0, 0, 1, 1)
+        self.layout.addWidget(self.dropdown1, 0, 1, 1, 1)
+        self.layout.addWidget(QLabel(""), 0, 2, 1, 1)
+        self.layout.addWidget(QLabel("Select Features:"), 1, 0, 1, 1)
+        self.layout.addWidget(self.dropdown2, 1, 1, 1, 1)
+        self.layout.addWidget(self.filter_data, 0, 3, 2, 2)
+        #self.layout.addWidget(QLabel(""), 1, 2, 4, 1)
+        #self.layout.addWidget(self.filter_data, 0, 6, 2, 3)
+        self.layout.addWidget(self.groupBox1, 2, 0, 5, 5)
+        #self.layout.addWidget(QLabel(""), 2, 5, 5, 1)
+        #self.layout.addWidget(self.groupBox2, 2, 6, 5, 3)
+        '''
         self.layout = QGridLayout(self.main_widget)
         self.layout.addWidget(QLabel("Select Feature Category:"),0,0,1,1)
         self.layout.addWidget(self.dropdown1,0,1,1,1)
@@ -154,10 +166,10 @@ class VariableDistribution(QMainWindow):
         self.layout.addWidget(self.filter_data,0,6,2,3)
         self.layout.addWidget(self.groupBox1,2,0,5,5)
         self.layout.addWidget(QLabel(""), 2, 5, 5, 1)
-        self.layout.addWidget(self.groupBox2, 2, 6, 5, 3)
+        self.layout.addWidget(self.groupBox2, 2, 6, 5, 3)'''
 
         self.setCentralWidget(self.main_widget)
-        self.resize(1400, 700)
+        self.resize(1200, 700)
         self.show()
         self.updateCategory()
 
@@ -303,9 +315,10 @@ class VariableRelation(QMainWindow):
         self.filter_radio_button.toggled.connect(self.onFilterClicked)
         self.filter_data.layout.addWidget(self.filter_radio_button, 0, 3,1,1)
 
-        self.btnCreateGraph = QPushButton("Create Graph")
-        self.btnCreateGraph.clicked.connect(self.update)
-        self.filter_data.layout.addWidget(self.btnCreateGraph, 1, 0, 1, 4)
+
+        #self.btnCreateGraph = QPushButton("Create Graph")
+        #self.btnCreateGraph.clicked.connect(self.update)
+        #self.filter_data.layout.addWidget(self.btnCreateGraph, 0, 6, 1, 4)
 
 
 
@@ -330,15 +343,19 @@ class VariableRelation(QMainWindow):
         self.layout.addWidget(self.filterBox1,0,0,2,2)
         self.layout.addWidget(QLabel(""), 0, 2, 2, 1)
         self.layout.addWidget(self.filterBox2,0,3,2,2)
-        self.layout.addWidget(QLabel(""), 0, 5, 2, 1)
-        self.layout.addWidget(self.filter_data,0,6,2,3)
-        self.layout.addWidget(self.groupBox1,2,0,6,5)
-        self.layout.addWidget(QLabel(""), 2, 5, 6, 1)
-        self.layout.addWidget(self.groupBox2, 2, 6, 6, 3)
+        #self.layout.addWidget(QLabel(""), 0, 5, 2, 1)
+        self.layout.addWidget(self.filter_data,2,0,1,2)
+        self.layout.addWidget(QLabel(""), 2, 2, 1, 1)
+        self.btnCreateGraph = QPushButton("Create Graph")
+        self.btnCreateGraph.clicked.connect(self.update)
+        self.layout.addWidget(self.btnCreateGraph, 2, 3, 1, 2)
+        self.layout.addWidget(self.groupBox1,3,0,7,5)
+        #self.layout.addWidget(QLabel(""), 2, 5, 6, 1)
+        #self.layout.addWidget(self.groupBox2, 2, 6, 6, 3)
 
 
         self.setCentralWidget(self.main_widget)
-        self.resize(1400, 700)
+        self.resize(1200, 700)
         self.show()
         self.updateCategory2()
 
@@ -570,16 +587,16 @@ class AttritionRelation(QMainWindow):
         self.layout.addWidget(QLabel(""), 0, 2, 1, 1)
         self.layout.addWidget(QLabel("Select Features:"),0,3,1,1)
         self.layout.addWidget(self.dropdown2,0,4,1,1)
-        self.layout.addWidget(QLabel(""), 0, 5, 1, 1)
-        self.layout.addWidget(self.btnCreateGraph, 0, 6, 1, 3)
+        #self.layout.addWidget(QLabel(""), 0, 5, 1, 1)
+        self.layout.addWidget(self.btnCreateGraph, 1, 0, 1, 5)
         #self.layout.addWidget(QLabel("Choose Data Filter:"), 0, 6, 1, 1)
         #self.layout.addWidget(self.filter_data,0,7,1,2)
-        self.layout.addWidget(self.groupBox1,1,0,5,5)
-        self.layout.addWidget(QLabel(""), 1, 5, 5, 1)
-        self.layout.addWidget(self.groupBox2, 1, 6, 5, 3)
+        self.layout.addWidget(self.groupBox1,2,0,6,5)
+        #self.layout.addWidget(QLabel(""), 1, 5, 5, 1)
+        #self.layout.addWidget(self.groupBox2, 1, 6, 5, 3)
 
         self.setCentralWidget(self.main_widget)
-        self.resize(1400, 700)
+        self.resize(1200, 700)
         self.show()
         self.updateCategory()
 
@@ -669,8 +686,8 @@ class AttritionRelation(QMainWindow):
 
         left1, right1 = self.ax1.get_xlim()
         left2, right2 = self.ax2.get_xlim()
-        print(left1, right1)
-        print(left2, right2)
+        #print(left1, right1)
+        #print(left2, right2)
 
         if (-left1 > right2):
             graph_x_limit = left1 - 30
@@ -682,8 +699,8 @@ class AttritionRelation(QMainWindow):
         self.ax2.set_xlim(0, -graph_x_limit)
         left1, right1 = self.ax1.get_xlim()
         left2, right2 = self.ax2.get_xlim()
-        print(left1, right1)
-        print(left2, right2)
+        #print(left1, right1)
+        #print(left2, right2)
 
         perc_move=(graph_x_limit)*(0.05)
         if (perc_move>-10):
@@ -861,23 +878,32 @@ class RandomForest(QMainWindow):
         self.lblResults.adjustSize()
         self.txtResults = QPlainTextEdit()
         #self.txtResults.setMinimumSize(200,100)
-        self.lblAccuracy = QLabel('Accuracy:')
-        self.txtAccuracy = QLineEdit()
+        #self.lblAccuracy = QLabel('Accuracy:')
+        #self.txtAccuracy = QLineEdit()
 
         self.groupBox2Layout.addWidget(self.lblResults)
         self.groupBox2Layout.addWidget(self.txtResults)
-        self.groupBox2Layout.addWidget(self.lblAccuracy)
-        self.groupBox2Layout.addWidget(self.txtAccuracy)
+        #self.groupBox2Layout.addWidget(self.lblAccuracy)
+        #self.groupBox2Layout.addWidget(self.txtAccuracy)
 
 
         self.groupBox3 = QGroupBox('Summary and Comparison')
         self.groupBox3Layout = QVBoxLayout()
         self.groupBox3.setLayout(self.groupBox3Layout)
         self.groupBox3.setMinimumSize(400, 50)
-
-        self.lbl_summary = QLabel('Summary:')
-        self.lbl_summary.adjustSize()
-        self.txt_summary = QPlainTextEdit()
+        self.lbl_current_model_summary = QLabel('Summary:')
+        self.current_model_summary = QWidget(self)
+        self.current_model_summary.layout = QFormLayout(self.current_model_summary)
+        # self.other_modelsLayout = QFormLayout()
+        # self.other_models.setLayout(self.other_modelsLayout)
+        self.txtCurrentAccuracy = QLineEdit()
+        self.txtCurrentPrecision = QLineEdit()
+        self.txtCurrentRecall = QLineEdit()
+        self.txtCurrentF1score = QLineEdit()
+        self.current_model_summary.layout.addRow('Accuracy:', self.txtCurrentAccuracy)
+        self.current_model_summary.layout.addRow('Precision:', self.txtCurrentPrecision)
+        self.current_model_summary.layout.addRow('Recall:', self.txtCurrentRecall)
+        self.current_model_summary.layout.addRow('F1 Score:', self.txtCurrentF1score)
         self.lbl_other_models = QLabel('Other Models Performance:')
         self.other_models = QWidget(self)
         self.other_models.layout = QFormLayout(self.other_models)
@@ -890,11 +916,10 @@ class RandomForest(QMainWindow):
         self.other_models.layout.addRow('KNN:', self.txtAccuracy_knn)
         self.other_models.layout.addRow('Decision Trees:', self.txtAccuracy_dt)
 
-        self.groupBox3Layout.addWidget(self.lbl_summary)
-        self.groupBox3Layout.addWidget(self.txt_summary)
+        self.groupBox3Layout.addWidget(self.lbl_current_model_summary)
+        self.groupBox3Layout.addWidget(self.current_model_summary)
         self.groupBox3Layout.addWidget(self.lbl_other_models)
         self.groupBox3Layout.addWidget(self.other_models)
-
 
         #::--------------------------------------
         # Graphic 1 : Confusion Matrix
@@ -1209,7 +1234,22 @@ class RandomForest(QMainWindow):
         # accuracy score
 
         self.ff_accuracy_score = accuracy_score(y_test, y_pred) * 100
-        self.txtAccuracy.setText(str(self.ff_accuracy_score))
+        self.txtCurrentAccuracy.setText(str(self.ff_accuracy_score))
+
+        # precision score
+
+        self.ff_precision_score = precision_score(y_test, y_pred)*100
+        self.txtCurrentPrecision.setText(str(self.ff_precision_score))
+
+        # recall score
+
+        self.ff_recall_score = recall_score(y_test, y_pred) * 100
+        self.txtCurrentRecall.setText(str(self.ff_recall_score))
+
+        # f1_score
+
+        self.ff_f1_score = f1_score(y_test, y_pred)
+        self.txtCurrentF1score.setText(str(self.ff_f1_score))
 
         #::------------------------------------
         ##  Ghaph1 :
@@ -1501,23 +1541,32 @@ class DecisionTree(QMainWindow):
         self.lblResults.adjustSize()
         self.txtResults = QPlainTextEdit()
         #self.txtResults.setMinimumSize(200,100)
-        self.lblAccuracy = QLabel('Accuracy:')
-        self.txtAccuracy = QLineEdit()
+        #self.lblAccuracy = QLabel('Accuracy:')
+        #self.txtAccuracy = QLineEdit()
 
         self.groupBox2Layout.addWidget(self.lblResults)
         self.groupBox2Layout.addWidget(self.txtResults)
-        self.groupBox2Layout.addWidget(self.lblAccuracy)
-        self.groupBox2Layout.addWidget(self.txtAccuracy)
+        #self.groupBox2Layout.addWidget(self.lblAccuracy)
+        #self.groupBox2Layout.addWidget(self.txtAccuracy)
 
 
         self.groupBox3 = QGroupBox('Summary and Comparison')
         self.groupBox3Layout = QVBoxLayout()
         self.groupBox3.setLayout(self.groupBox3Layout)
         self.groupBox3.setMinimumSize(400, 50)
-
-        self.lbl_summary = QLabel('Summary:')
-        self.lbl_summary.adjustSize()
-        self.txt_summary = QPlainTextEdit()
+        self.lbl_current_model_summary = QLabel('Summary:')
+        self.current_model_summary = QWidget(self)
+        self.current_model_summary.layout = QFormLayout(self.current_model_summary)
+        # self.other_modelsLayout = QFormLayout()
+        # self.other_models.setLayout(self.other_modelsLayout)
+        self.txtCurrentAccuracy = QLineEdit()
+        self.txtCurrentPrecision = QLineEdit()
+        self.txtCurrentRecall = QLineEdit()
+        self.txtCurrentF1score = QLineEdit()
+        self.current_model_summary.layout.addRow('Accuracy:', self.txtCurrentAccuracy)
+        self.current_model_summary.layout.addRow('Precision:', self.txtCurrentPrecision)
+        self.current_model_summary.layout.addRow('Recall:', self.txtCurrentRecall)
+        self.current_model_summary.layout.addRow('F1 Score:', self.txtCurrentF1score)
         self.lbl_other_models = QLabel('Other Models Performance:')
         self.other_models = QWidget(self)
         self.other_models.layout = QFormLayout(self.other_models)
@@ -1530,8 +1579,8 @@ class DecisionTree(QMainWindow):
         self.other_models.layout.addRow('KNN:', self.txtAccuracy_knn)
         self.other_models.layout.addRow('Random Forest:', self.txtAccuracy_rf)
 
-        self.groupBox3Layout.addWidget(self.lbl_summary)
-        self.groupBox3Layout.addWidget(self.txt_summary)
+        self.groupBox3Layout.addWidget(self.lbl_current_model_summary)
+        self.groupBox3Layout.addWidget(self.current_model_summary)
         self.groupBox3Layout.addWidget(self.lbl_other_models)
         self.groupBox3Layout.addWidget(self.other_models)
 
@@ -1843,7 +1892,22 @@ class DecisionTree(QMainWindow):
         # accuracy score
 
         self.ff_accuracy_score = accuracy_score(y_test, y_pred) * 100
-        self.txtAccuracy.setText(str(self.ff_accuracy_score))
+        self.txtCurrentAccuracy.setText(str(self.ff_accuracy_score))
+
+        # precision score
+
+        self.ff_precision_score = precision_score(y_test, y_pred)*100
+        self.txtCurrentPrecision.setText(str(self.ff_precision_score))
+
+        # recall score
+
+        self.ff_recall_score = recall_score(y_test, y_pred) * 100
+        self.txtCurrentRecall.setText(str(self.ff_recall_score))
+
+        # f1_score
+
+        self.ff_f1_score = f1_score(y_test, y_pred)
+        self.txtCurrentF1score.setText(str(self.ff_f1_score))
 
         #::------------------------------------
         ##  Ghaph1 :
@@ -2144,27 +2208,38 @@ class LogisticRegressionClassifier(QMainWindow):
         self.groupBox2.setLayout(self.groupBox2Layout)
         self.groupBox2.setMinimumSize(400, 50)
 
+
         self.lblResults = QLabel('Results:')
         self.lblResults.adjustSize()
         self.txtResults = QPlainTextEdit()
         #self.txtResults.setMinimumSize(200,100)
-        self.lblAccuracy = QLabel('Accuracy:')
-        self.txtAccuracy = QLineEdit()
+        #self.lblAccuracy = QLabel('Accuracy:')
+        #self.txtAccuracy = QLineEdit()
 
         self.groupBox2Layout.addWidget(self.lblResults)
         self.groupBox2Layout.addWidget(self.txtResults)
-        self.groupBox2Layout.addWidget(self.lblAccuracy)
-        self.groupBox2Layout.addWidget(self.txtAccuracy)
+        #self.groupBox2Layout.addWidget(self.lblAccuracy)
+        #self.groupBox2Layout.addWidget(self.txtAccuracy)
 
 
         self.groupBox3 = QGroupBox('Summary and Comparison')
         self.groupBox3Layout = QVBoxLayout()
         self.groupBox3.setLayout(self.groupBox3Layout)
         self.groupBox3.setMinimumSize(400, 50)
+        self.lbl_current_model_summary = QLabel('Summary:')
+        self.current_model_summary = QWidget(self)
+        self.current_model_summary.layout = QFormLayout(self.current_model_summary)
+        # self.other_modelsLayout = QFormLayout()
+        # self.other_models.setLayout(self.other_modelsLayout)
+        self.txtCurrentAccuracy = QLineEdit()
+        self.txtCurrentPrecision = QLineEdit()
+        self.txtCurrentRecall = QLineEdit()
+        self.txtCurrentF1score = QLineEdit()
+        self.current_model_summary.layout.addRow('Accuracy:', self.txtCurrentAccuracy)
+        self.current_model_summary.layout.addRow('Precision:', self.txtCurrentPrecision)
+        self.current_model_summary.layout.addRow('Recall:', self.txtCurrentRecall)
+        self.current_model_summary.layout.addRow('F1 Score:', self.txtCurrentF1score)
 
-        self.lbl_summary = QLabel('Summary:')
-        self.lbl_summary.adjustSize()
-        self.txt_summary = QPlainTextEdit()
         self.lbl_other_models = QLabel('Other Models Performance:')
         self.other_models = QWidget(self)
         self.other_models.layout = QFormLayout(self.other_models)
@@ -2177,8 +2252,8 @@ class LogisticRegressionClassifier(QMainWindow):
         self.other_models.layout.addRow('KNN:', self.txtAccuracy_knn)
         self.other_models.layout.addRow('Decision Trees:', self.txtAccuracy_dt)
 
-        self.groupBox3Layout.addWidget(self.lbl_summary)
-        self.groupBox3Layout.addWidget(self.txt_summary)
+        self.groupBox3Layout.addWidget(self.lbl_current_model_summary)
+        self.groupBox3Layout.addWidget(self.current_model_summary)
         self.groupBox3Layout.addWidget(self.lbl_other_models)
         self.groupBox3Layout.addWidget(self.other_models)
 
@@ -2482,7 +2557,22 @@ class LogisticRegressionClassifier(QMainWindow):
         # accuracy score
 
         self.ff_accuracy_score = accuracy_score(y_test, y_pred) * 100
-        self.txtAccuracy.setText(str(self.ff_accuracy_score))
+        self.txtCurrentAccuracy.setText(str(self.ff_accuracy_score))
+
+        # precision score
+
+        self.ff_precision_score = precision_score(y_test, y_pred)
+        self.txtCurrentPrecision.setText(str(self.ff_precision_score))
+
+        # recall score
+
+        self.ff_recall_score = recall_score(y_test, y_pred) * 100
+        self.txtCurrentRecall.setText(str(self.ff_recall_score))
+
+        # f1_score
+
+        self.ff_f1_score = f1_score(y_test, y_pred)
+        self.txtCurrentF1score.setText(str(self.ff_f1_score))
 
         #::------------------------------------
         ##  Ghaph1 :
@@ -2527,11 +2617,10 @@ class LogisticRegressionClassifier(QMainWindow):
         scores_arr = []
         #feature_arr = []
         for val in (X_train.columns):
-            #print(val)
-            cvs_X = X_train[val].values.reshape(-1, 1)
-            #print(cvs_X)
-            scores = cross_val_score(self.clf_lr, cvs_X, y_train, cv=10)
+            cvs_X = X_test[val].values.reshape(-1, 1)
+            scores = cross_val_score(self.clf_lr, cvs_X, y_test, cv=5)
             scores_arr.append(scores.mean())
+            #print(scores,scores.mean())
 
         #importances = self.clf_knn.feature_importances_
 
@@ -2542,9 +2631,12 @@ class LogisticRegressionClassifier(QMainWindow):
         f_importances=f_importances[0:20]
         X_Features = f_importances.index
         y_Importance = list(f_importances)
-
+        max_value=f_importances.max()
+        min_value = f_importances.min()
         self.ax3.barh(X_Features, y_Importance )
-        self.ax3.set_aspect('auto')
+        self.ax3.set_xlim(min_value-(min_value*0.05),max_value+(max_value*0.05))
+        #self.ax3.set_aspect('auto')
+
 
         # show the plot
         self.fig3.tight_layout()
@@ -2782,24 +2874,41 @@ class KNNClassifier(QMainWindow):
         self.lblResults.adjustSize()
         self.txtResults = QPlainTextEdit()
         #self.txtResults.setMinimumSize(200,100)
-        self.lblAccuracy = QLabel('Accuracy:')
-        self.txtAccuracy = QLineEdit()
+        #self.lblAccuracy = QLabel('Accuracy:')
+        #self.txtAccuracy = QLineEdit()
 
         self.groupBox2Layout.addWidget(self.lblResults)
         self.groupBox2Layout.addWidget(self.txtResults)
-        self.groupBox2Layout.addWidget(self.lblAccuracy)
-        self.groupBox2Layout.addWidget(self.txtAccuracy)
+        #self.groupBox2Layout.addWidget(self.lblAccuracy)
+        #self.groupBox2Layout.addWidget(self.txtAccuracy)
 
 
         self.groupBox3 = QGroupBox('Summary and Comparison')
         self.groupBox3Layout = QVBoxLayout()
         self.groupBox3.setLayout(self.groupBox3Layout)
         self.groupBox3.setMinimumSize(400, 50)
+        self.lbl_current_model_summary = QLabel('Summary:')
+        self.current_model_summary = QWidget(self)
+        self.current_model_summary.layout = QFormLayout(self.current_model_summary)
+        # self.other_modelsLayout = QFormLayout()
+        # self.other_models.setLayout(self.other_modelsLayout)
+        self.txtCurrentAccuracy = QLineEdit()
+        self.txtCurrentPrecision = QLineEdit()
+        self.txtCurrentRecall = QLineEdit()
+        self.txtCurrentF1score = QLineEdit()
+        self.current_model_summary.layout.addRow('Accuracy:', self.txtCurrentAccuracy)
+        self.current_model_summary.layout.addRow('Precision:', self.txtCurrentPrecision)
+        self.current_model_summary.layout.addRow('Recall:', self.txtCurrentRecall)
+        self.current_model_summary.layout.addRow('F1 Score:', self.txtCurrentF1score)
 
-        self.lbl_summary = QLabel('Summary:')
-        self.lbl_summary.adjustSize()
-        self.txt_summary = QPlainTextEdit()
-        self.lbl_other_models = QLabel('Other Models Performance:')
+
+
+
+
+        #self.lbl_summary = QLabel('Summary:')
+        #self.lbl_summary.adjustSize()
+        #self.txt_summary = QPlainTextEdit()
+        self.lbl_other_models = QLabel('Other Models Accuracy:')
         self.other_models = QWidget(self)
         self.other_models.layout = QFormLayout(self.other_models)
         #self.other_modelsLayout = QFormLayout()
@@ -2811,8 +2920,8 @@ class KNNClassifier(QMainWindow):
         self.other_models.layout.addRow('Logistic Regression:', self.txtAccuracy_lr)
         self.other_models.layout.addRow('Decision Trees:', self.txtAccuracy_dt)
 
-        self.groupBox3Layout.addWidget(self.lbl_summary)
-        self.groupBox3Layout.addWidget(self.txt_summary)
+        self.groupBox3Layout.addWidget(self.lbl_current_model_summary)
+        self.groupBox3Layout.addWidget(self.current_model_summary)
         self.groupBox3Layout.addWidget(self.lbl_other_models)
         self.groupBox3Layout.addWidget(self.other_models)
 
@@ -3128,7 +3237,22 @@ class KNNClassifier(QMainWindow):
         # accuracy score
 
         self.ff_accuracy_score = accuracy_score(y_test, y_pred) * 100
-        self.txtAccuracy.setText(str(self.ff_accuracy_score))
+        self.txtCurrentAccuracy.setText(str(self.ff_accuracy_score))
+
+        # precision score
+
+        self.ff_precision_score = precision_score(y_test, y_pred)*100
+        self.txtCurrentPrecision.setText(str(self.ff_precision_score))
+
+        # recall score
+
+        self.ff_recall_score = recall_score(y_test, y_pred) * 100
+        self.txtCurrentRecall.setText(str(self.ff_recall_score))
+
+        # f1_score
+
+        self.ff_f1_score = f1_score(y_test, y_pred)
+        self.txtCurrentF1score.setText(str(self.ff_f1_score))
 
         #::------------------------------------
         ##  Ghaph1 :
@@ -3201,9 +3325,11 @@ class KNNClassifier(QMainWindow):
         f_importances=f_importances[0:20]
         X_Features = f_importances.index
         y_Importance = list(f_importances)
-
-        self.ax3.barh(X_Features, y_Importance )
-        self.ax3.set_aspect('auto')
+        max_value = f_importances.max()
+        min_value = f_importances.min()
+        self.ax3.barh(X_Features, y_Importance)
+        self.ax3.set_xlim(min_value - (min_value * 0.05), max_value + (max_value * 0.05))
+        #self.ax3.set_aspect('auto')
 
         # show the plot
         self.fig3.tight_layout()
