@@ -601,29 +601,53 @@ class AttritionRelation(QMainWindow):
 
             category_values=["Max","Median","Mean","Min"]
             val1.append(-1 * (yes_data[graph_feature1].max()))
-            val1.append(-1 * (yes_data[graph_feature1].median(skipna=True)))
-            val1.append(-1 * (yes_data[graph_feature1].mean(skipna=True)))
+            val1.append(-1 * (round(yes_data[graph_feature1].median(skipna=True),1)))
+            val1.append(-1 * (round(yes_data[graph_feature1].mean(skipna=True),1)))
             val1.append(-1*(yes_data[graph_feature1].min()))
 
             val2.append(no_data[graph_feature1].max())
-            val2.append(no_data[graph_feature1].median(skipna=True))
-            val2.append(no_data[graph_feature1].mean(skipna=True))
+            val2.append(round(no_data[graph_feature1].median(skipna=True),1))
+            val2.append(round(no_data[graph_feature1].mean(skipna=True),1))
             val2.append(no_data[graph_feature1].min())
 
-
-        self.ax1.barh(category_values, val1, color='blue')
+        self.ax1.barh(category_values, val1, color='blue',height=0.3)
         self.ax1.set_title("Attrition: No")
         self.ax1.axis('off')
-        #self.ax1.set_xlabel(cat1)
-        #self.ax1.set_ylabel("Count")
         self.ax1.grid(False)
 
-        self.ax2.barh(category_values, val2, color='red')
+        self.ax2.barh(category_values, val2, color='red', height=0.3)
         self.ax2.set_title("Attrition: Yes")
         self.ax2.axis('off')
         #self.ax2.set_xlabel(cat1)
         #self.ax2.set_ylabel("Count")
         self.ax2.grid(False)
+
+        left1, right1 = self.ax1.get_xlim()
+        left2, right2 = self.ax2.get_xlim()
+
+        if (-left1 > right2):
+            graph_x_limit = left1 - 30
+
+        else:
+            graph_x_limit = -right2 - 30
+
+        self.ax1.set_xlim(graph_x_limit, 0)
+        self.ax2.set_xlim(0, -graph_x_limit)
+
+
+        perc_move=(graph_x_limit)*(0.05)
+        if (perc_move>-10):
+            perc_move=-10
+
+        for index1, value1 in enumerate(val1):
+
+            self.ax1.text(value1 + perc_move , index1, str(-1*(value1)))
+            self.ax1.text(graph_x_limit, index1, str(category_values[index1]), fontweight='bold', horizontalalignment='left', fontsize=10)
+
+
+        for index2, value2 in enumerate(val2):
+            self.ax2.text(value2, index2, str(value2))
+
 
         self.fig.tight_layout()
         self.fig.canvas.draw_idle()
