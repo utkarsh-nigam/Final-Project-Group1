@@ -1,6 +1,15 @@
 import sys,os
-#os.chdir("/Users/utkarshvirendranigam/Desktop/Homework/Project")
-#from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QAction, QComboBox, QLabel, QGridLayout, QCheckBox, QGroupBox
+os.chdir("/Users/utkarshvirendranigam/Desktop/Homework/Project")
+required_packages=["PyQt5","scipy","itertools","random","matplotlib","pandas","numpy","sklearn","pydotplus","collections","warnings","seaborn"]
+
+print(os.getcwd())
+for my_package in required_packages:
+    try:
+        command_string="conda install "+ my_package+ " --yes"
+        os.system(command_string)
+    except:
+        count=1
+
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget, QPushButton, QAction, QComboBox, QLabel,
                              QGridLayout, QCheckBox, QGroupBox, QVBoxLayout, QHBoxLayout, QLineEdit, QPlainTextEdit)
 
@@ -12,7 +21,6 @@ from PyQt5.QtCore import Qt
 from scipy import interp
 from itertools import cycle, combinations
 import random
-import statsmodels.api as sm
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QSizePolicy, QFormLayout, QRadioButton, QScrollArea, QMessageBox
 from PyQt5.QtGui import QPixmap
 
@@ -22,7 +30,6 @@ from matplotlib.figure import Figure
 import pandas as pd
 import numpy as np
 from numpy.polynomial.polynomial import polyfit
-
 
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.model_selection import train_test_split, cross_val_score
@@ -431,12 +438,7 @@ class VariableRelation(QMainWindow):
             self.update()
 
     def update(self):
-        #::--------------------------------------------------------
-        # This method executes each time a change is made on the canvas
-        # containing the elements of the graph
-        # The purpose of the method es to draw a dot graph using the
-        # score of happiness and the feature chosen the canvas
-        #::--------------------------------------------------------
+
         colors=["b", "r", "g", "y", "k", "c"]
         self.ax.clear()
         if (self.set_Filter=="Yes" or self.set_Filter=="No"):
@@ -523,21 +525,11 @@ class VariableRelation(QMainWindow):
 
 
 class AttritionRelation(QMainWindow):
-    #::---------------------------------------------------------
-    # This class crates a canvas with a plot to show the relation
-    # from each feature in the dataset with the happiness score
-    # methods
-    #    _init_
-    #   update
-    #::---------------------------------------------------------
+
     send_fig = pyqtSignal(str)
 
     def __init__(self):
-        #::--------------------------------------------------------
-        # Crate a canvas with the layout to draw a dotplot
-        # The layout sets all the elements and manage the changes
-        # made on the canvas
-        #::--------------------------------------------------------
+
         super(AttritionRelation, self).__init__()
 
         self.Title = "EDA: Attrition Relation"
@@ -617,12 +609,7 @@ class AttritionRelation(QMainWindow):
 
 
     def update(self):
-        #::--------------------------------------------------------
-        # This method executes each time a change is made on the canvas
-        # containing the elements of the graph
-        # The purpose of the method es to draw a dot graph using the
-        # score of happiness and the feature chosen the canvas
-        #::--------------------------------------------------------
+
         colors=["b", "r", "g", "y", "k", "c"]
         self.ax1.clear()
         self.ax2.clear()
