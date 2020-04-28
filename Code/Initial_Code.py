@@ -503,6 +503,7 @@ class VariableRelation(QMainWindow):
         self.fig.canvas.draw_idle()
 
 
+
 class AttritionRelation(QMainWindow):
     #::---------------------------------------------------------
     # This class crates a canvas with a plot to show the relation
@@ -609,12 +610,15 @@ class AttritionRelation(QMainWindow):
         self.ax2.clear()
         self.filtered_data = attr_data.copy()
         graph_feature1 = self.dropdown2.currentText()
+        category_values=[]
         val1 = []
         val2 = []
         if (graph_feature1 in categorical_features):
             self.filtered_data["Count"]=1
-            category_values=self.filtered_data[graph_feature1].unique()
-
+            self.filtered_data[graph_feature1]=self.filtered_data[graph_feature1].astype(str)
+            category_values=self.filtered_data[graph_feature1].unique().tolist()
+            #for item in temp_values:
+                #category_values.append(str(item))
             yes_data=self.filtered_data[self.filtered_data["Attrition"]=="Yes"]
             no_data=self.filtered_data[self.filtered_data["Attrition"]=="No"]
 
@@ -626,7 +630,7 @@ class AttritionRelation(QMainWindow):
             my_pt_no = pd.DataFrame(my_pt_no.to_records())
             my_dict_no = dict(zip(my_pt_no[graph_feature1], my_pt_no["Count"]))
             for temp_value in category_values:
-                if temp_value in my_dict_yes.keys():
+                if temp_value in (my_dict_yes.keys()):
                     val1.append(-1*(my_dict_yes[temp_value]))
                 else:
                     val1.append(0)
@@ -665,6 +669,8 @@ class AttritionRelation(QMainWindow):
 
         left1, right1 = self.ax1.get_xlim()
         left2, right2 = self.ax2.get_xlim()
+        print(left1, right1)
+        print(left2, right2)
 
         if (-left1 > right2):
             graph_x_limit = left1 - 30
@@ -674,7 +680,10 @@ class AttritionRelation(QMainWindow):
 
         self.ax1.set_xlim(graph_x_limit, 0)
         self.ax2.set_xlim(0, -graph_x_limit)
-
+        left1, right1 = self.ax1.get_xlim()
+        left2, right2 = self.ax2.get_xlim()
+        print(left1, right1)
+        print(left2, right2)
 
         perc_move=(graph_x_limit)*(0.05)
         if (perc_move>-10):
@@ -682,7 +691,7 @@ class AttritionRelation(QMainWindow):
 
         for index1, value1 in enumerate(val1):
 
-            self.ax1.text(value1 + perc_move , index1, str(-1*(value1)))
+            self.ax1.text(value1 , index1, str(-1*(value1)), color='white')
             self.ax1.text(graph_x_limit, index1, str(category_values[index1]), fontweight='bold', horizontalalignment='left', fontsize=10)
 
 
@@ -692,6 +701,7 @@ class AttritionRelation(QMainWindow):
 
         self.fig.tight_layout()
         self.fig.canvas.draw_idle()
+
 
 
 class RandomForest(QMainWindow):
