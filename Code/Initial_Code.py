@@ -255,7 +255,7 @@ class VariableRelation(QMainWindow):
         self.dropdown1.currentIndexChanged.connect(self.updateCategory1)
         self.dropdown2 = QComboBox()
         self.dropdown2.addItems(self.featuresList1)
-        self.dropdown2.currentIndexChanged.connect(self.updateCategory2)
+        self.dropdown2.currentIndexChanged.connect(self.checkifsame)
         self.filterBox1Layout.addWidget(QLabel("Select Feature Category:"),0,0)
         self.filterBox1Layout.addWidget(self.dropdown1,0,1)
         self.filterBox1Layout.addWidget(QLabel("Select Feature:"),1,0)
@@ -343,6 +343,11 @@ class VariableRelation(QMainWindow):
         self.show()
         self.updateCategory2()
 
+    def checkifsame(self):
+        print(self.dropdown2.currentText(),self.dropdown4.currentText())
+        if(self.dropdown2.currentText()==self.dropdown4.currentText()):
+            self.updateCategory2()
+
     def updateCategory1(self):
         self.dropdown2.clear()
         feature_category1 = self.dropdown1.currentText()
@@ -425,6 +430,7 @@ class VariableRelation(QMainWindow):
             for i in range(len(class_names_y)-1):
                 for j in range(len(class_names_x)-1):
                     self.ax.text(j, i, str(my_np[i][j]))
+            print(self.ax.get_xlim())
 
         elif((graph_feature1 in continuous_features) and (graph_feature2 in continuous_features)):
             x_axis_data = self.filtered_data[graph_feature1]
@@ -440,6 +446,7 @@ class VariableRelation(QMainWindow):
             self.ax.set_xlabel(graph_feature1)
             self.ax.set_ylabel(graph_feature2)
             self.ax.grid(True)
+            print(self.ax.get_xlim())
 
         else:
 
@@ -460,9 +467,11 @@ class VariableRelation(QMainWindow):
             my_np_2 = [d[m] for d, m in zip(my_np.T, mask.T)]
             class_names_x = my_pt.columns.values.tolist()
             self.ax.boxplot(my_np_2)
+            #self.ax.axes.autoscale()
             self.ax.set_xlabel(categorical_data)
             self.ax.set_ylabel(continuous_data)
             self.ax.set_xticklabels(class_names_x)
+            print(self.ax.get_xlim())
 
 
 
