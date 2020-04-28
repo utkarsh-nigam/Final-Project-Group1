@@ -1,5 +1,5 @@
 import sys,os
-#os.chdir("/Users/utkarshvirendranigam/Desktop/Homework/Project")
+os.chdir("/Users/utkarshvirendranigam/Desktop/Homework/Project")
 #from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QAction, QComboBox, QLabel, QGridLayout, QCheckBox, QGroupBox
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget, QPushButton, QAction, QComboBox, QLabel,
                              QGridLayout, QCheckBox, QGroupBox, QVBoxLayout, QHBoxLayout, QLineEdit, QPlainTextEdit)
@@ -207,7 +207,6 @@ class VariableDistribution(QMainWindow):
         del self.filtered_data
 
 
-
 class VariableRelation(QMainWindow):
     #::---------------------------------------------------------
     # This class crates a canvas with a plot to show the relation
@@ -344,9 +343,33 @@ class VariableRelation(QMainWindow):
         self.updateCategory2()
 
     def checkifsame(self):
-        print(self.dropdown2.currentText(),self.dropdown4.currentText())
+        if(self.dropdown2.currentText() in continuous_features):
+            type1="continuous"
+        else:
+            type1 = "categorical"
+
         if(self.dropdown2.currentText()==self.dropdown4.currentText()):
             self.updateCategory2()
+
+        if(type1=="categorical"):
+            self.ifbothcategroical()
+
+    def ifbothcategroical(self):
+        self.dropdown4.clear()
+        feature_category2 = self.dropdown3.currentText()
+        if (feature_category2 == "Personal"):
+            self.featuresList2 = list(set(continuous_features) & set(personal_features))
+        elif (feature_category2 == "Organisation"):
+            self.featuresList2 = list(set(continuous_features) & set(organisation_features))
+        elif (feature_category2 == "Commution"):
+            self.featuresList2 = list(set(continuous_features) & set(commution_features))
+        elif (feature_category2 == "Satisfaction"):
+            self.featuresList2 = list(set(continuous_features) & set(satisfaction_features))
+        if (self.dropdown2.currentText() in self.featuresList2):
+            self.featuresList2.remove(self.dropdown2.currentText())
+        # print(self.featuresList2)
+        self.dropdown4.addItems(self.featuresList2)
+
 
     def updateCategory1(self):
         self.dropdown2.clear()
@@ -380,6 +403,7 @@ class VariableRelation(QMainWindow):
             self.featuresList2.remove(self.dropdown2.currentText())
         #print(self.featuresList2)
         self.dropdown4.addItems(self.featuresList2)
+        self.checkifsame()
 
 
     def onFilterClicked(self):
@@ -406,6 +430,7 @@ class VariableRelation(QMainWindow):
         graph_feature1 = self.dropdown2.currentText()
         graph_feature2 = self.dropdown4.currentText()
 
+        '''
         if((graph_feature1 in categorical_features) and (graph_feature2 in categorical_features)):
             graph_data=self.filtered_data[[graph_feature1,graph_feature2]]
             graph_data["Employee Count"]=1
@@ -431,8 +456,9 @@ class VariableRelation(QMainWindow):
                 for j in range(len(class_names_x)-1):
                     self.ax.text(j, i, str(my_np[i][j]))
             print(self.ax.get_xlim())
+        '''
 
-        elif((graph_feature1 in continuous_features) and (graph_feature2 in continuous_features)):
+        if((graph_feature1 in continuous_features) and (graph_feature2 in continuous_features)):
             x_axis_data = self.filtered_data[graph_feature1]
             y_axis_data = self.filtered_data[graph_feature2]
             #print(x_axis_data)
@@ -446,7 +472,6 @@ class VariableRelation(QMainWindow):
             self.ax.set_xlabel(graph_feature1)
             self.ax.set_ylabel(graph_feature2)
             self.ax.grid(True)
-            print(self.ax.get_xlim())
 
         else:
 
@@ -471,7 +496,6 @@ class VariableRelation(QMainWindow):
             self.ax.set_xlabel(categorical_data)
             self.ax.set_ylabel(continuous_data)
             self.ax.set_xticklabels(class_names_x)
-            print(self.ax.get_xlim())
 
 
 
@@ -1317,6 +1341,7 @@ class RandomForest(QMainWindow):
         # End of Other Models Comparison
         #::-----------------------------
 
+
 class DecisionTree(QMainWindow):
     #::--------------------------------------------------------------------------------
     # Implementation of Random Forest Classifier using the happiness dataset
@@ -1962,6 +1987,7 @@ class DecisionTree(QMainWindow):
         #::-----------------------------
         # End of Other Models Comparison
         #::-----------------------------
+
 
 class LogisticRegressionClassifier(QMainWindow):
     #::--------------------------------------------------------------------------------
@@ -3248,7 +3274,6 @@ class KNNClassifier(QMainWindow):
         #::-----------------------------
 
 
-
 class PlotCanvas(FigureCanvas):
     #::----------------------------------------------------------
     # creates a figure on the canvas
@@ -3303,12 +3328,7 @@ class App(QMainWindow):
         self.top = 200
         self.width = 1000
         self.height = 500
-        self.Title = 'Predict Employee Attrition'
-        label = QLabel(self)
-        pixmap = QPixmap('EM.png')
-        label.setPixmap(pixmap)
-        self.setCentralWidget(label)
-        self.resize(pixmap.width(), pixmap.height())
+        self.Title = 'Attrition Predictor'
         self.initUI()
 
     def initUI(self):
@@ -3481,7 +3501,6 @@ def main():
     app.setStyle('Fusion')
     ex = App()
     ex.show()
-    ex.showMaximized()
     sys.exit(app.exec_())
 
 
